@@ -1,0 +1,4 @@
+#Sun Dec 25 15:22:17 CST 2016
+base.0=/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/transforms/dex/debug/folders/1000/1f/main
+renamed.0=classes.dex
+file.0=/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/transforms/dex/debug/folders/1000/1f/main/classes.dex

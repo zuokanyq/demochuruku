@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="DeviceAPIver20160627">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/DeviceAPIver20160627.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

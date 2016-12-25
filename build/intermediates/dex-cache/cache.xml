@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/libs/DeviceAPIver20160627.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.1"
+        sha1="95b2001423653f6f7412f312d5e1ee24239ebf98">
+        <dex dex="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/pre-dexed/debug/DeviceAPIver20160627_14415260700b294089114701327d94262aa4f766.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.1"
+        sha1="68b7d0c63eef108399dd6164315be4734e870b18">
+        <dex dex="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/pre-dexed/debug/instant-run_66a90903738e8cf5bced201997c12dfa8bf46fac.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.1"
+        sha1="71e7251b2e08549a1fbb60e52bd81f772d79c0d3">
+        <dex dex="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/pre-dexed/debug/instant-run-bootstrap_b716c572cb56f213498fafac570e17e86e9ef0e3.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/melly/Development/sdk/extras/android/m2repository/com/android/support/support-v4/18.0.0/support-v4-18.0.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.1"
+        sha1="44ec51e9d395a47aab135e5e1b556c0007442156">
+        <dex dex="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/pre-dexed/debug/support-v4-18.0.0_a93057c4379f77e837ef8b2a1c02f696c2043b2e.jar" />
+    </item>
+
+</items>
