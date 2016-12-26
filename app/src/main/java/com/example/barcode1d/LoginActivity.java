@@ -14,10 +14,17 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class LoginActivity extends BaseActivity {
 	
@@ -35,6 +42,7 @@ public class LoginActivity extends BaseActivity {
 
 	public static final int LOGIN_SUECCESS = 1;
     public static final int LOGIN_FAULT = 0;
+    public static final int LOGIN_ERROR = -1;
 
 	private Handler handler = new Handler() {
 
@@ -57,9 +65,14 @@ public class LoginActivity extends BaseActivity {
                     startActivity(intent);
                     finish();
                     break;
-				default:
+                case LOGIN_ERROR:
                     Toast.makeText(LoginActivity.this,
-                            "account or password is invalid",
+                            "网络故障",
+                            Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    Toast.makeText(LoginActivity.this,
+                            "用户名或密码不正确",
                             Toast.LENGTH_SHORT).show();
 
 			}
@@ -87,56 +100,55 @@ public class LoginActivity extends BaseActivity {
 		login.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-                sendRequestWithHttpURLConnection();
+                String url = "http://192.168.168.115:8080/loginfault.txt";
+                try {
+                    doGetRequest(url);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+                //     sendRequestWithHttpURLConnection();
 			}
 		});
 	}
 
-	private boolean login(){
-		return true;
-	}
+    private void doGetRequest(String url) throws IOException{
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
 
-	private void sendRequestWithHttpURLConnection() {
-		// 开启线程来发起网络请求
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				HttpURLConnection connection = null;
-				try {
-					URL url = new URL("http://192.168.168.115:8080/login.txt");
-					connection = (HttpURLConnection) url.openConnection();
-					connection.setRequestMethod("GET");
-					connection.setConnectTimeout(8000);
-					connection.setReadTimeout(8000);
-					connection.setDoInput(true);
-					connection.setDoOutput(true);
-					InputStream in = connection.getInputStream();
-					// 下面对获取到的输入流进行读取
-					BufferedReader reader = new BufferedReader(
-							new InputStreamReader(in));
-					StringBuilder response = new StringBuilder();
-					String line;
-					while ((line = reader.readLine()) != null) {
-						response.append(line);
-					}
-					Message message = new Message();
-                    if("success".equals(response.toString())){
-                        message.what = LOGIN_SUECCESS;
-					    // 将服务器返回的结果存放到Message中
-                    }else{
-                        message.what = LOGIN_FAULT;
+        client.newCall(request)
+                .enqueue(new Callback() {
+                    @Override
+                    public void onFailure(final Call call, IOException e) {
+                        // Error
+                        Message message = new Message();
+                        message.what = LOGIN_ERROR;
+                        handler.sendMessage(message);
+                        /*runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // For the example, you can show an error dialog or a toast
+                                // on the main UI thread
+                            }
+                        });*/
                     }
 
-					handler.sendMessage(message);
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					if (connection != null) {
-						connection.disconnect();
-					}
-				}
-			}
-		}).start();
-	}
+                    @Override
+                    public void onResponse(Call call, final Response response) throws IOException {
+                        String res = response.body().string();
+                        Message message = new Message();
+                        if("success".equals(res)){
+                            message.what = LOGIN_SUECCESS;
+                        }else{
+                            message.what = LOGIN_FAULT;
+                        }
+                        handler.sendMessage(message);
+                    }
+                });
+    }
+
 
 }

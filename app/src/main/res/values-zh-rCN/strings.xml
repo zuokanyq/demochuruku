@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">demo-1DBarcode</string>
+    <string name="app_name">静置老化计时系统</string>
     <string name="action_settings">设置</string>
     <string name="action_about">关于</string>
     <string name="title_ip_or_domain">输入域名/IP</string>
@@ -77,7 +77,8 @@
     <string name="default_font_gray_scale">4</string>
     <string name="fontGrayscaleName">打印灰度</string>
     <string name="fontGrayScaleRange">(1~8)</string>
-    <string name="PrintContent"> HELLO WORLD! \n</string>
+    <string name="PrintContent"> HELLO WORLD! \n
+</string>
 
     <!-- DeviceListActivity -->
     <string name="scanning">扫描设备...</string>
@@ -637,4 +638,8 @@
     <string name="psam_title_clear">清除</string>
     <string name="psam_msg_fail">操作失败</string>
 
+    <!--login-->
+    <string name="Account">用户名:</string>
+    <string name="Password">密  码:</string>
+    <string name="Accounttips">请输入用户名</string>
 </resources>

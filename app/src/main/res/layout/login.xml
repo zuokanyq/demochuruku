@@ -8,19 +8,19 @@
 
         <TextView
             android:layout_height="wrap_content"
-            android:text="Account:" />
+            android:text="@string/Account" />
 
         <EditText
             android:id="@+id/account"
             android:layout_height="wrap_content"
-            android:hint="Input your account" />
+            android:hint="@string/Accounttips"/>
     </TableRow>
 
     <TableRow>
 
         <TextView
             android:layout_height="wrap_content"
-            android:text="Password:" />
+            android:text="@string/Password" />
 
         <EditText
             android:id="@+id/password"
