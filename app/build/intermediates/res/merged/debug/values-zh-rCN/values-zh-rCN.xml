@@ -165,6 +165,8 @@
         <item>1.8V</item>
         <item>iso</item>
     </string-array>
+    <string name="Account">用户名:</string>
+    <string name="Accounttips">请输入用户名</string>
     <string name="Clear">清空</string>
     <string name="HintChannelCount">频道数不小于1</string>
     <string name="OAUTH_AccessToken_ACCESS">用户授权登录成功</string>
@@ -173,6 +175,7 @@
     <string name="OAUTH_ERROR">服务器验证失败</string>
     <string name="OAUTH_RequestToken_ACCESS">第三方应用验证成功</string>
     <string name="OAUTH_RequestToken_ERROR">第三方应用验证失败</string>
+    <string name="Password">密  码:</string>
     <string name="Print">打印</string>
     <string name="PrintContent"> HELLO WORLD! \n
 </string>
@@ -205,7 +208,7 @@
     <string name="app_menu_surelogout">确定退出程序吗？</string>
     <string name="app_msg_exit_confirm">再按一次退出</string>
     <string name="app_msg_init">正在初始化模块...</string>
-    <string name="app_name">demo-1DBarcode</string>
+    <string name="app_name">静置老化计时系统</string>
     <string name="app_run_code_error">应用程序运行时异常</string>
     <string name="app_title">手持机测试程序 %s</string>
     <string name="b14443_msg_cmd_data">命令返回数据</string>

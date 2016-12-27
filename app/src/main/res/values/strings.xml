@@ -645,4 +645,6 @@ System
     <string name="Account">Account:</string>
     <string name="Password">Password:</string>
     <string name="Accounttips">Input your account</string>
+    <string name="Login">Login</string>
+    <string name="Rememberpassword">Remember password</string>
 </resources>

@@ -182,8 +182,11 @@
     <color name="yellow">#FFFF00</color>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <string name="Account">Account:</string>
+    <string name="Accounttips">Input your account</string>
     <string name="Clear">Clear</string>
     <string name="HintChannelCount">Channel number not less than 1</string>
+    <string name="Password">Password:</string>
     <string name="Print">Print</string>
     <string name="PrintContent"> HELLO WORLD! \n
 </string>
@@ -208,7 +211,7 @@
     <string name="ap_title_wifi_size">WiFi Count：</string>
     <string name="app_msg_exit_confirm">Again according to the exit</string>
     <string name="app_msg_init">init...</string>
-    <string name="app_name">demo-1DBarcode</string>
+    <string name="app_name">Timer </string>
     <string name="app_title">Handset Tools %s</string>
     <string name="b14443_msg_cmd_data">Command returns data</string>
     <string name="b14443_msg_data">Initialize the data returned</string>
@@ -629,14 +632,10 @@
     <string name="yid_title">1D Barcode Tool</string>
     <string name="yid_title_scan_compare">Compare</string>
     <string name="yid_title_scan_continuous">Auto,interval</string>
-    <style name="AppBaseTheme" parent="@android:style/Theme.Holo.Light">        <!--
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        -->
+    <style name="AppBaseTheme" parent="@android:style/Theme.Holo.Light">        
     </style>
     <style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        
         <item name="android:actionBarStyle">@style/MyActionBarStyle</item>
     </style>
     <style name="MyActionBarStyle" parent="@android:style/Widget.Holo.ActionBar">

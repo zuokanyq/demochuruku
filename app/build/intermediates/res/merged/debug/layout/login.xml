@@ -1,26 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="100dip"
+        android:gravity="center"
+        android:textSize = "38sp"
+        android:text="系统登录" />
+
+    <TableLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:stretchColumns="1" >
+    android:stretchColumns="1"
+        android:paddingLeft="20dip"
+        android:paddingRight="20dip"
+        >
 
     <TableRow>
 
         <TextView
             android:layout_height="wrap_content"
-            android:text="Account:" />
+            android:text="@string/Account" />
 
         <EditText
             android:id="@+id/account"
             android:layout_height="wrap_content"
-            android:hint="Input your account" />
+            android:hint="@string/Accounttips"/>
     </TableRow>
 
     <TableRow>
 
         <TextView
             android:layout_height="wrap_content"
-            android:text="Password:" />
+            android:text="@string/Password" />
 
         <EditText
             android:id="@+id/password"
@@ -49,3 +63,4 @@
     </TableRow>
 
 </TableLayout>
+</LinearLayout>

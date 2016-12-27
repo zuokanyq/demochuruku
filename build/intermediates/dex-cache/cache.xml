@@ -3,39 +3,57 @@
 
     <item
         is-multidex="false"
-        jar="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/libs/DeviceAPIver20160627.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.1"
-        sha1="95b2001423653f6f7412f312d5e1ee24239ebf98">
-        <dex dex="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/pre-dexed/debug/DeviceAPIver20160627_14415260700b294089114701327d94262aa4f766.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.1"
-        sha1="68b7d0c63eef108399dd6164315be4734e870b18">
-        <dex dex="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/pre-dexed/debug/instant-run_66a90903738e8cf5bced201997c12dfa8bf46fac.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.1"
-        sha1="71e7251b2e08549a1fbb60e52bd81f772d79c0d3">
-        <dex dex="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/pre-dexed/debug/instant-run-bootstrap_b716c572cb56f213498fafac570e17e86e9ef0e3.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/melly/Development/sdk/extras/android/m2repository/com/android/support/support-v4/18.0.0/support-v4-18.0.0.jar"
+        jar="D:\Development\Android\sdk\extras\android\m2repository\com\android\support\support-v4\18.0.0\support-v4-18.0.0.jar"
         jumboMode="true"
         optimize="true"
         revision="23.0.1"
         sha1="44ec51e9d395a47aab135e5e1b556c0007442156">
-        <dex dex="/Users/melly/AndroidStudioProjects/demo-1DBarcode_as/app/build/intermediates/pre-dexed/debug/support-v4-18.0.0_a93057c4379f77e837ef8b2a1c02f696c2043b2e.jar" />
+        <dex dex="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\pre-dexed\debug\support-v4-18.0.0_bab5611eb5bc79db7dbef36fc0696222cb786f0f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.1"
+        sha1="0dac7e2536ebaefcd283587f830f1c557fa23363">
+        <dex dex="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\pre-dexed\debug\instant-run_50c740f293e35142e965ed839342953e3090855e.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.1"
+        sha1="6e7348fa06b3fe6f3289497d8aa91eaa6dca42f5">
+        <dex dex="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\pre-dexed\debug\instant-run-bootstrap_1dccfc3c73f8092168dee9cfcc8eecb2f5a52d18.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Program Files\Android\Android Studio\gradle\gradle-2.14.1\caches\modules-2\files-2.1\com.squareup.okio\okio\1.6.0\98476622f10715998eacf9240d6b479f12c66143\okio-1.6.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.1"
+        sha1="98476622f10715998eacf9240d6b479f12c66143">
+        <dex dex="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\pre-dexed\debug\okio-1.6.0_98f68dbfcbf8ca35c7fc1362a8bdd57c6e1881ed.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Program Files\Android\Android Studio\gradle\gradle-2.14.1\caches\modules-2\files-2.1\com.squareup.okhttp3\okhttp\3.2.0\f7873a2ebde246a45c2a8d6f3247108b4c88a879\okhttp-3.2.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.1"
+        sha1="f7873a2ebde246a45c2a8d6f3247108b4c88a879">
+        <dex dex="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\pre-dexed\debug\okhttp-3.2.0_caffbaf51bda720550285309850eb29c186bdcda.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Development\Android\projects\samples\demochuruku\app\libs\DeviceAPIver20160627.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.1"
+        sha1="95b2001423653f6f7412f312d5e1ee24239ebf98">
+        <dex dex="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\pre-dexed\debug\DeviceAPIver20160627_1c13d862565fabfc8ad3cf50007b471bf8597f71.jar" />
     </item>
 
 </items>

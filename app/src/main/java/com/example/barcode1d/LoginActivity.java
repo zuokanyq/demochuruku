@@ -13,17 +13,14 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class LoginActivity extends BaseActivity {
@@ -61,7 +58,7 @@ public class LoginActivity extends BaseActivity {
                         editor.clear();
                     }
                     editor.commit();
-                    Intent intent = new Intent(LoginActivity.this, FirstActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, InputActivity.class);
                     startActivity(intent);
                     finish();
                     break;
@@ -100,9 +97,15 @@ public class LoginActivity extends BaseActivity {
 		login.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-                String url = "http://192.168.168.115:8080/loginfault.txt";
+                String url = "http://192.168.168.115:8080/login.txt";
+                String account = accountEdit.getText().toString();
+                String password = passwordEdit.getText().toString();
+                FormBody.Builder formBuilder = new FormBody.Builder()
+                        .add("account",account)
+                        .add("password",password);
+                RequestBody formBody = formBuilder.build();
                 try {
-                    doGetRequest(url);
+                    doPostRequest(url,formBody);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -113,10 +116,12 @@ public class LoginActivity extends BaseActivity {
 		});
 	}
 
-    private void doGetRequest(String url) throws IOException{
+ //网络连接
+    private void doPostRequest(String url,RequestBody formBody) throws IOException{
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(url)
+                .post(formBody)
                 .build();
 
         client.newCall(request)
