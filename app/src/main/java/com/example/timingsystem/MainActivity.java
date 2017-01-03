@@ -9,20 +9,15 @@ import android.widget.Toast;
 
 import com.example.timingsystem.fragment.ErDSoftScanFragment;
 import com.example.timingsystem.fragment.ErDSoftSetFragment;
+import com.example.timingsystem.fragment.InputFragment;
 import com.rscja.utility.StringUtility;
 import com.zebra.adc.decoder.Barcode2DWithSoft;
 
 /**
- * 二维软解码使用demo
+ * 基于wushengjun的二维软解码使用demo修改而成
  * 
- * 1、使用前请确认您的机器已安装此模块。 2、要正常使用模块需要在\libs\armeabi\目录放置libDeviceAPI.so文件，同时在\libs\目录下放置libDeviceAPIver20160627.jar文件。
- * 3、在操作设备前需要调用 open()打开设备，使用完后调用 close() 关闭设备
- * 
- * 
- * 更多函数的使用方法请查看API说明文档
- * 
- * @author wushengjun
- * 更新于2016月8月8日
+ * @author zuokanyq
+ *
  */
 public class MainActivity extends BaseTabFragmentActivity {
 
@@ -56,9 +51,11 @@ public class MainActivity extends BaseTabFragmentActivity {
 	@Override
 	protected void initViewPageData() {
 		lstFrg.add(new ErDSoftScanFragment());
+		lstFrg.add(new InputFragment());
 		lstFrg.add(new ErDSoftSetFragment());
 
 		lstTitles.add(getString(R.string.er_dsoft_tab_scan));
+		lstTitles.add(getString(R.string.er_dsoft_tab_input));
 		lstTitles.add(getString(R.string.er_dsoft_tab_set));
 	}
 	

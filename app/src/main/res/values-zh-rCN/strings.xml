@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">cw-demo-2D-Soft</string>
+    <string name="app_name">计时系统</string>
     <string name="action_settings">设置</string>
     <string name="action_about">关于</string>
     <string name="action_display">显示设置</string>
@@ -926,6 +926,7 @@
     <string name="keyboard_title_multiple">全键盘</string>
     <string name="title_activity_er_dsoft">二维(软解)</string>
     <string name="er_dsoft_tab_scan">扫描</string>
+    <string name="er_dsoft_tab_input">入库</string>
     <string name="er_dsoft_tab_pic">拍照</string>
     <string name="er_dsoft_tab_set">设置</string>
 
@@ -937,6 +938,13 @@
 
     <string name="er_dsoft_Set_succ">设置成功</string>
     <string name="er_dsoft_Set_fail">设置失败</string>
+    <!--input-->
+    <string name="input_batch_number">批次号</string>
+    <string name="input_location_number">库位号</string>
+    <string name="input_btn_start_scan">开始扫描</string>
+    <string name="input_btn_stop_scan">结束扫描</string>
+    <string name="input_btn_submit">确认</string>
+    <string name="input_btn_clear">清除</string>
 
     <!--login-->
     <string name="Account">用户名:</string>
