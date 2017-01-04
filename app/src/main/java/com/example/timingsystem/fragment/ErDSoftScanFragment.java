@@ -206,7 +206,7 @@ public class ErDSoftScanFragment extends KeyDwonFragment {
                 }
 
                 btn_Clear.setEnabled(false);
-                cbContinuous.setEnabled(false);
+               // cbContinuous.setEnabled(false);
             }
             init_barcode = et_init_barcode.getText().toString();
 

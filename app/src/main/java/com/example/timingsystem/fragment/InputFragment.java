@@ -66,9 +66,9 @@ public class InputFragment extends KeyDwonFragment {
 
             String strData = "";
 
-            if ((sussCount + errorCount + failCount) % 1000 == 0) {
+           /* if ((sussCount + errorCount + failCount) % 1000 == 0) {
                 tv_Result.setText("");
-            }
+            }*/
 
             if (length < 1) {
 
@@ -127,6 +127,7 @@ public class InputFragment extends KeyDwonFragment {
         btn_Start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                isLocationNumber=true;
                 doDecode();
             }
         });
@@ -135,7 +136,8 @@ public class InputFragment extends KeyDwonFragment {
         btn_BnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                doScanBn();
+                isLocationNumber=false;
+                doDecode();
             }
         });
 
@@ -154,50 +156,17 @@ public class InputFragment extends KeyDwonFragment {
         clear();
     }
 
-/*
-
- */
-    private void doScanBn(){
-        isLocationNumber=false;
-        if (mContext.mReader != null) {
-
-            mContext.mReader.setScanCallback(mScanCallback);
-        }
-
-        Log.i("ErDSoftScanFragment","doDecode() threadStop="+threadStop);
-        if (threadStop) {
-            thread = new DecodeThread(false, 1000);
-            thread.start();
-        }
-    }
-
-
     private void doDecode() {
-        isLocationNumber=true;
+//        isLocationNumber=true;
 
         if (mContext.mReader != null) {
 
             mContext.mReader.setScanCallback(mScanCallback);
         }
-
         Log.i("ErDSoftScanFragment","doDecode() threadStop="+threadStop);
 
-        if (threadStop) {
-
-            boolean bContinuous = true;
-            int iBetween = 100; // 毫秒
-            btn_Start.setText(getString(R.string.input_btn_stop_scan));
-            threadStop = false;
-            btn_Clear.setEnabled(false);
-            thread = new DecodeThread(bContinuous, iBetween);
+            thread = new DecodeThread();
             thread.start();
-
-        } else {
-            btn_Start.setText(getString(R.string.input_btn_start_scan));
-            threadStop = true;
-//            cbContinuous.setEnabled(true);
-            btn_Clear.setEnabled(true);
-        }
 
     }
 
@@ -216,32 +185,13 @@ public class InputFragment extends KeyDwonFragment {
     }
 
     private class DecodeThread extends Thread {
-        private boolean isContinuous = false;
-        private long sleepTime = 1000;
-
-
-        public DecodeThread(boolean isContinuous, int sleep) {
-            this.isContinuous = isContinuous;
-            this.sleepTime = sleep;
+        public DecodeThread() {
         }
 
         @Override
         public void run() {
             super.run();
-
-            do {
-
                 mContext.mReader.scan();
-
-                if (isContinuous) {
-                    try {
-                        Thread.sleep(sleepTime);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            } while (isContinuous && !threadStop);
         }
 
     }
@@ -253,7 +203,6 @@ public class InputFragment extends KeyDwonFragment {
         isCurrFrag=false;
 
         threadStop = true;
-//        cbContinuous.setEnabled(true);
         btn_Start.setText(getString(R.string.input_btn_start_scan));
 
         btn_Clear.setEnabled(true);
@@ -281,6 +230,7 @@ public class InputFragment extends KeyDwonFragment {
 
     @Override
     public void myOnKeyDwon() {
+        isLocationNumber=true;
         doDecode();
     }
 }
