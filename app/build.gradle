@@ -5,9 +5,10 @@ android {
     buildToolsVersion '23.0.1'
 
     defaultConfig {
-        applicationId "com.example.barcode1d"
+        applicationId "com.example.timingsystem"
         minSdkVersion 11
         targetSdkVersion 15
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -19,7 +20,20 @@ android {
 }
 
 dependencies {
+    compile 'com.android.support:appcompat-v7:18.0.0'
     compile 'com.android.support:support-v4:18.0.0'
     compile files('libs/DeviceAPIver20160627.jar')
+    compile files('libs/xUtils-2.5.5.jar')
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
+
+    androidTestCompile 'com.android.support:support-annotations:24.0.0'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+    // Optional -- Hamcrest library
+    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
+    // Optional -- UI testing with Espresso
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
 }
