@@ -16,11 +16,14 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.timingsystem.model.MdSHMobileUserInfo;
 import com.example.timingsystem.services.CallWebService;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -147,12 +150,16 @@ public class LoginActivity extends BaseActivity {
         @Override
         protected Void doInBackground(String... params) {
             //Invoke webservice
-            String url = "http://192.168.168.196:7676/SRC/business/moreuserlogin.asmx";
+            String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
             String webMethName = "HasMobilePermission";
-            Map<String, String> paramsmap=new HashMap<String, String>();
-            paramsmap.put("userID",userID);
-            paramsmap.put("passWord",passWord);
-            resTxt = CallWebService.invokeLoginWS(url,webMethName,paramsmap);
+            Map<String, Object > paramsmap=new HashMap<String, Object>();
+            MdSHMobileUserInfo userInfo=new MdSHMobileUserInfo();
+            userInfo.setUserID(userID);
+            userInfo.setPassWord(passWord);
+
+            paramsmap.put("userInfo",userInfo);
+            MdSHMobileUserInfo obj = (MdSHMobileUserInfo)CallWebService.invokeLoginWS(url,webMethName,paramsmap);
+
             return null;
         }
 
