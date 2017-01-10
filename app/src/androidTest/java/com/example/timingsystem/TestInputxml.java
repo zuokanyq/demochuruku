@@ -1,138 +1,79 @@
-package com.example.timingsystem.services;
+package com.example.timingsystem;
 
-import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.SmallTest;
+import android.support.test.runner.AndroidJUnit4;
 import android.util.Xml;
 
-import com.example.timingsystem.MainActivity;
 import com.example.timingsystem.helper.InputServer;
 import com.example.timingsystem.model.InputBatch;
 import com.example.timingsystem.model.InputLocation;
-import com.example.timingsystem.model.MdSHMobileUserInfo;
+import com.example.timingsystem.services.InputIntentService;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
+
 
 /**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
+ * Created by zuokanyq on 2017-1-5.
  */
-public class InputIntentService extends IntentService {
-    // TODO: Rename actions, choose action names that describe tasks that this
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_PUSHINPUT = "com.example.timingsystem.services.action.PUSHINPUT";
-    private static final String ACTION_GETDATA = "com.example.timingsystem.services.action.GETDATA";
 
-    // TODO: Rename parameters
-    private static final String EXTRA_GETPARAM = "com.example.timingsystem.services.extra.GETPARAM";
-
+@RunWith(AndroidJUnit4.class)
+@SmallTest
+public class TestInputxml {
     private InputServer inputServer;
-    private SharedPreferences pref;
 
-    public InputIntentService() {
-        super("InputIntentService");
-        inputServer=new InputServer(this);
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
+    @Before
+    public void createInputServer() {
+        Context appContext = InstrumentationRegistry.getTargetContext();
+        inputServer = new InputServer(appContext);
     }
 
-    /**
-     * Starts this service to perform action Foo with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    public static void startActionPushInput(Context context) {
-        Intent intent = new Intent(context, InputIntentService.class);
-        intent.setAction(ACTION_PUSHINPUT);
-        context.startService(intent);
-    }
 
-    /**
-     * Starts this service to perform action Baz with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    public static void startActionGetData(Context context, String param1) {
-        Intent intent = new Intent(context, InputIntentService.class);
-
-        intent.setAction(ACTION_GETDATA);
-        intent.putExtra(EXTRA_GETPARAM, param1);
-        context.startService(intent);
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            if (ACTION_PUSHINPUT.equals(action)) {
-                handleActionPushInput();
-            } else if (ACTION_GETDATA.equals(action)) {
-                final String batchNO = intent.getStringExtra(EXTRA_GETPARAM);
-                handleActionGetData(batchNO);
-            }
-        }
-    }
-
-    /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionPushInput() {
-        // TODO: Handle action PushInput
-        //debug
+    public void generateXmlTest() {
         insertInputData();
-        //
 
         List<InputBatch> inputBatchList=inputServer.getInputBatchList();
 
-        //debug
-        Integer size1=inputBatchList.size();
-        //size1=3
+        assertThat(inputBatchList.size(), is(3));
 
         String inputxml = generateXml(inputBatchList);
 
-        String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
-        String webMethName = "HasMobilePermission";
-        Map<String, String> paramsmap=new HashMap<String, String>();
-        paramsmap.put("InputSend",inputxml);
+        inputServer.deleteInputBatch(inputBatchList);
 
-        //debug
-        String obj="success";
-     //   String obj = CallWebService.invokeLoginWS(url,webMethName,paramsmap);
+        List<InputBatch> inputBatchListno= inputServer.getInputBatchList();
+        assertThat(inputBatchListno.size(), is(0));
 
-        if("success".equals(obj)){
-            inputServer.deleteInputBatch(inputBatchList);
-        }
-        List<InputBatch> inputBatchListend=inputServer.getInputBatchList();
-        //debug
-        Integer size2=inputBatchListend.size();
-        //size2=0
     }
 
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionGetData(String param1) {
-        // TODO: Handle action GetData
+
+    @Test
+    public void parserXmlTest() {
+        String xmlstr="<OutputQueryReturn>" +
+                "<LotNO>123</LotNO>" +
+                "<StockNO>" +
+                "<NO>1-1-1-1</NO>" +
+                "<NO>2-2-2-2</NO>" +
+                "</StockNO>" +
+                "</OutputQueryReturn>";
+        InputBatch inputBatch = getInputBatch(xmlstr);
+
+        assertThat(inputBatch.getBatchno(), is("123"));
+
     }
 
     private void insertInputData(){
@@ -244,7 +185,5 @@ public class InputIntentService extends IntentService {
 
         return xml;
     }
-
-
 
 }
