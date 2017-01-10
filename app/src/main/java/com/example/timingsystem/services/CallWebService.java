@@ -1,6 +1,7 @@
 package com.example.timingsystem.services;
 import com.example.timingsystem.model.MdSHMobileUserInfo;
 
+
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
@@ -22,8 +23,8 @@ public class CallWebService {
     //SOAP Action URI again http://tempuri.org
     private static String SOAP_ACTION = "http://tempuri.org/";
 
-    public static Object invokeLoginWS(String webServiceUrl, String webMethName, Map<String, Object> Params) {
-        Object resObj = null;
+    public static String invokeLoginWS(String webServiceUrl, String webMethName, Map<String, String> Params) {
+        String resTxt = null;
         // Create request
         SoapObject request = new SoapObject(NAMESPACE, webMethName);
         // 2、设置调用方法的参数值，如果没有参数，可以省略，
@@ -33,8 +34,8 @@ public class CallWebService {
                 Map.Entry entry = (Map.Entry) iter.next();
                 PropertyInfo pi = new PropertyInfo();
                 pi.setName((String) entry.getKey());
-                pi.setValue((MdSHMobileUserInfo) entry.getValue());
-                pi.setType(MdSHMobileUserInfo.class);
+                pi.setValue((String) entry.getValue());
+                pi.setType(PropertyInfo.STRING_CLASS);
                 request.addProperty(pi);
 
             }
@@ -42,10 +43,10 @@ public class CallWebService {
         // Create envelope
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
-        envelope.addMapping(NAMESPACE, "MdSHMobileUserInfo",
-                new MdSHMobileUserInfo().getClass());
+       /* envelope.addMapping(NAMESPACE, "MdSHMobileUserInfo",
+                new MdSHMobileUserInfo().getClass());*/
         //Set envelope as dotNet
-        envelope.dotNet = false;
+        envelope.dotNet = true;
 
         // Set output SOAP object
         envelope.setOutputSoapObject(request);
@@ -63,21 +64,20 @@ public class CallWebService {
             String requestDump = androidHttpTransport.requestDump;
             String responseDump = androidHttpTransport.responseDump;
             // Get the response
-            //SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
-            MdSHMobileUserInfo  resObj1 = (MdSHMobileUserInfo ) envelope.getResponse();
+            SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+           //   resObj1 = (MdSHMobileUserInfo ) envelope.getResponse();
             // Assign it to resTxt variable static variable
 //            String prot1=(String) response.getProperty("diffgram");
-            resObj=resObj1;
-//            resTxt = response.toString();
+            resTxt = response.toString();
 
         } catch (Exception e) {
             //Print error
             e.printStackTrace();
             //Assign error message to resTxt
-           // resObj = "Error occured";
+            resTxt= "Error occured";
         }
         //Return resTxt to calling object
-        return resObj;
+        return resTxt;
     }
 
 }

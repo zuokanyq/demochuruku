@@ -26,13 +26,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import okhttp3.Call;
+/*import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.Response;*/
 
 /**
  * 系统登录demo
@@ -102,6 +102,9 @@ public class LoginActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
+
+        MdSHMobileUserInfo.initMapping();
+
 		pref = PreferenceManager.getDefaultSharedPreferences(this);
 		accountEdit = (EditText) findViewById(R.id.account);
 		passwordEdit = (EditText) findViewById(R.id.password);
@@ -152,13 +155,9 @@ public class LoginActivity extends BaseActivity {
             //Invoke webservice
             String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
             String webMethName = "HasMobilePermission";
-            Map<String, Object > paramsmap=new HashMap<String, Object>();
-            MdSHMobileUserInfo userInfo=new MdSHMobileUserInfo();
-            userInfo.setUserID(userID);
-            userInfo.setPassWord(passWord);
-
-            paramsmap.put("userInfo",userInfo);
-            MdSHMobileUserInfo obj = (MdSHMobileUserInfo)CallWebService.invokeLoginWS(url,webMethName,paramsmap);
+            Map<String, String> paramsmap=new HashMap<String, String>();
+            paramsmap.put("userInfo","<username>");
+            String obj = CallWebService.invokeLoginWS(url,webMethName,paramsmap);
 
             return null;
         }
@@ -184,7 +183,7 @@ public class LoginActivity extends BaseActivity {
 
 
  //网络连接
-    private void doPostRequest(String url,RequestBody formBody) throws IOException{
+/*    private void doPostRequest(String url,RequestBody formBody) throws IOException{
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(url)
@@ -199,13 +198,13 @@ public class LoginActivity extends BaseActivity {
                         Message message = new Message();
                         message.what = LOGIN_ERROR;
                         handler.sendMessage(message);
-                        /*runOnUiThread(new Runnable() {
+                        *//*runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 // For the example, you can show an error dialog or a toast
                                 // on the main UI thread
                             }
-                        });*/
+                        });*//*
                     }
 
                     @Override
@@ -220,7 +219,7 @@ public class LoginActivity extends BaseActivity {
                         handler.sendMessage(message);
                     }
                 });
-    }
+    }*/
 
     /**
      * 调用WebService

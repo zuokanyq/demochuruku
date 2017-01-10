@@ -1,25 +1,36 @@
 package com.example.timingsystem.model;
 
-import org.ksoap2.serialization.KvmSerializable;
-import org.ksoap2.serialization.PropertyInfo;
+
 
 import java.util.Hashtable;
+
+import org.ksoap2.serialization.DataSoapObject;
+import org.ksoap2.serialization.KvmSerializable;
+import org.ksoap2.serialization.PropertyInfo;
 
 /**
  * Created by MELLY on 2017-1-6.
  */
 
-public class MdSHMobileUserInfo  implements KvmSerializable {
+public class MdSHMobileUserInfo extends DataSoapObject {
+    private static final String DATA_NAMESPACE = "http://tempuri.org/";
+    private static final String CLASS_NAME_LISTAESAMI = "MdSHMobileUserInfo";
 
-    private String UserID = null;
+    public String UserID = null;
 
-    private String PassWord = null;
+    public String PassWord = null;
 
-//    private  ArrayList<String> StockPosition =null ;
+    public  String[] StockPosition =null ;
 
     // constructors
 
     public MdSHMobileUserInfo(){
+        super(DATA_NAMESPACE, CLASS_NAME_LISTAESAMI);
+    }
+
+    public static void initMapping() {
+        System.setProperty(CLASS_NAME_LISTAESAMI,
+                "com.example.timingsystem.model.MdSHMobileUserInfo");
     }
 
     public String getUserID() {
@@ -38,73 +49,27 @@ public class MdSHMobileUserInfo  implements KvmSerializable {
         this.PassWord = passWord;
     }
 
-//    public List<String> getStockPosition() {
-//        return this.StockPosition;
-//    }
-//
-//    public void setStockPosition(ArrayList<String> stockPosition) {
-//        this.StockPosition = stockPosition;
-//    }
+    public String[] getStockPosition() {
+        return StockPosition;
+    }
 
-    @Override
-    public Object getProperty(int index) {
-        // TODO Auto-generated method stub
-        switch(index)
-        {
-            case 0:
-                return this.UserID;
-            case 1:
-                return this.PassWord;
-            /*case 2:
-                return this.StockPosition;*/
+    public void setStockPosition(String[] stockPosition) {
+        StockPosition = stockPosition;
+    }
+
+    public String toString() {
+        String tmp = "MdSHMobileUserInfo= { ";
+        tmp += "UserID=" + UserID + ", ";
+        tmp += "PassWord=" + PassWord + ", ";
+
+        if (StockPosition != null) {
+            tmp += ", StockPosition= [ ";
+            for (int i = 0; i < StockPosition.length; i++) {
+                tmp += StockPosition[i] + " ";
+            }
+            tmp += "]";
         }
-        return null;
+        tmp += "}";
+        return tmp;
     }
-
-
-    @Override
-    public int getPropertyCount() {
-        // TODO Auto-generated method stub
-        return 2;
-    }
-
-    @Override
-    public void getPropertyInfo(int index, Hashtable arg1, PropertyInfo info) {
-        // TODO Auto-generated method stub
-        switch(index)
-        {
-            case 0:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "UserID";
-                break;
-            case 1:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "PassWord";
-                break;
-            /*case 2:
-                info.type = ArrayList.class;
-                info.name = "StockPosition";
-                break;*/
-            default:break;
-        }
-
-    }
-
-    @Override
-    public void setProperty(int index, Object value) {
-        // TODO Auto-generated method stub
-        switch(index)
-        {
-            case 0:
-                this.UserID = value.toString();
-                break;
-            case 1:
-                this.PassWord = value.toString();
-                break;
-            /*case 2:
-                this.StockPosition = (ArrayList<String>) value;
-                break;*/
-        }
-    }
-
 }
