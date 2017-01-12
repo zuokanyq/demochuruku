@@ -1,6 +1,7 @@
 package com.example.timingsystem;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,6 +11,8 @@ import android.widget.Toast;
 import com.example.timingsystem.fragment.ErDSoftScanFragment;
 import com.example.timingsystem.fragment.ErDSoftSetFragment;
 import com.example.timingsystem.fragment.InputFragment;
+import com.example.timingsystem.fragment.TestFragment;
+import com.example.timingsystem.services.LongRunningService;
 import com.rscja.utility.StringUtility;
 import com.zebra.adc.decoder.Barcode2DWithSoft;
 
@@ -34,6 +37,9 @@ public class MainActivity extends BaseTabFragmentActivity {
 		initViewPager();
 		initTabs();
 
+		Intent intent = new Intent(this, LongRunningService.class);
+		startService(intent);
+
 
 		try {
 			mReader = Barcode2DWithSoft.getInstance();
@@ -52,7 +58,7 @@ public class MainActivity extends BaseTabFragmentActivity {
 	protected void initViewPageData() {
 		lstFrg.add(new ErDSoftScanFragment());
 		lstFrg.add(new InputFragment());
-		lstFrg.add(new ErDSoftSetFragment());
+		lstFrg.add(new TestFragment());
 
 		lstTitles.add(getString(R.string.er_dsoft_tab_scan));
 		lstTitles.add(getString(R.string.er_dsoft_tab_input));

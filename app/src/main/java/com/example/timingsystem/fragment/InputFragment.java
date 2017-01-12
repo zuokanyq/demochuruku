@@ -1,6 +1,12 @@
 package com.example.timingsystem.fragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,14 +18,19 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.timingsystem.Constants;
 import com.example.timingsystem.LoginActivity;
 import com.example.timingsystem.MainActivity;
 import com.example.timingsystem.R;
+import com.example.timingsystem.helper.InputServer;
+import com.example.timingsystem.services.InputIntentService;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
 import com.rscja.utility.StringUtility;
 import com.zebra.adc.decoder.Barcode2DWithSoft;
+
+import java.io.UnsupportedEncodingException;
 
 
 public class InputFragment extends KeyDwonFragment {
@@ -30,6 +41,8 @@ public class InputFragment extends KeyDwonFragment {
     private Button btn_BnScan;
     @ViewInject(R.id.btn_Clear)
     private Button btn_Clear;
+    @ViewInject(R.id.btn_submit)
+    private Button btn_Submit;
     @ViewInject(R.id.tv_result)
     private TextView tv_Result;
     @ViewInject(R.id.tv_batch_number)
@@ -52,6 +65,7 @@ public class InputFragment extends KeyDwonFragment {
 
     private MainActivity mContext;
 
+    private SubmitStateReceiver mSubmitStateReceiver;
 
     public Barcode2DWithSoft.ScanCallback mScanCallback = new Barcode2DWithSoft.ScanCallback() {
         @Override
@@ -86,7 +100,12 @@ public class InputFragment extends KeyDwonFragment {
 
             mContext.mReader.stopScan();
 
-            String barCode = new String(data);
+            String barCode = null;
+            try {
+                barCode = new String(data,"GBK").trim();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
 
             if(isLocationNumber) {
 
@@ -146,12 +165,13 @@ public class InputFragment extends KeyDwonFragment {
 
     }
 
-//    @OnClick(R.id.btn_Start)
-//    public void btn_Start_onClick(View v) {
-//        doDecode();
-//    }
 
-    @OnClick(R.id.btn_Clear)
+    @OnClick(R.id.btn_submit)
+    public void btn_Submit_onClick(View v) {
+        submit();
+    }
+
+     @OnClick(R.id.btn_Clear)
     public void btn_Clear_onClick(View v) {
         clear();
     }
@@ -171,9 +191,36 @@ public class InputFragment extends KeyDwonFragment {
     }
 
 
+    private void submit() {
+        String BatchNo = tv_batch_number.getText().toString();
+        if(BatchNo.isEmpty()){
+            Toast.makeText(getActivity(),
+                    R.string.msg_batchNo_empty,
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String locationNos=tv_Result.getText().toString();
+        if(locationNos.isEmpty()){
+            Toast.makeText(getActivity(),
+                    R.string.msg_LocationNO_empty,
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        InputIntentService.startActionSaveInput(mContext,tv_batch_number.getText().toString(),tv_Result.getText().toString());
+
+       /* Toast.makeText(getActivity(),
+                R.string.msg_submit_success,
+                Toast.LENGTH_SHORT).show();*/
+
+    }
+
+
+
     private void clear() {
         tv_Result.setText("");
-
+        tv_batch_number.setText("");
         int total = 0;
         sussCount = 0;
         failCount = 0;
@@ -213,6 +260,7 @@ public class InputFragment extends KeyDwonFragment {
 
 
         }
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mSubmitStateReceiver);
 
     }
 
@@ -223,6 +271,16 @@ public class InputFragment extends KeyDwonFragment {
         super.onResume();
 
         isCurrFrag=true;
+        //动态注册广播接收器
+        IntentFilter statusIntentFilter = new IntentFilter(Constants.ACTION_SAVEINPUT);
+        // Adds a data filter for the HTTP scheme
+     //   statusIntentFilter.addDataScheme("http");
+        // Instantiates a new DownloadStateReceiver
+        mSubmitStateReceiver = new SubmitStateReceiver();
+        // Registers the DownloadStateReceiver and its intent filters
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(
+                mSubmitStateReceiver,
+                statusIntentFilter);
 
 
     }
@@ -233,4 +291,30 @@ public class InputFragment extends KeyDwonFragment {
         isLocationNumber=true;
         doDecode();
     }
+
+    // Broadcast receiver for receiving status updates from the IntentService
+    private class SubmitStateReceiver extends BroadcastReceiver
+    {
+        // Prevents instantiation
+        private SubmitStateReceiver() {
+        }
+        // Called when the BroadcastReceiver gets an Intent it's registered to receive
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String i="";
+           if(Constants.RES_SUCCEES.equals(intent.getStringExtra(Constants.EXTENDED_DATA_STATUS))){
+
+               Toast.makeText(getActivity(),
+                       R.string.msg_submit_success,
+                       Toast.LENGTH_SHORT).show();
+               clear();
+           }
+        /*
+         * Handle Intents here.
+         */
+
+        }
+    }
+
+
 }

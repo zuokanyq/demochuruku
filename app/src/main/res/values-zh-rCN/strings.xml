@@ -946,6 +946,11 @@
     <string name="input_btn_submit">确认</string>
     <string name="input_btn_clear">清除</string>
 
+    <string name="msg_batchNo_empty">请扫描批次号</string>
+    <string name="msg_LocationNO_empty">请扫描库位号</string>
+    <string name="msg_submit_success">提交成功</string>
+    <string name="msg_submit_fault">提交失败</string>
+
     <!--login-->
     <string name="Account">用户名:</string>
     <string name="Password">密  码:</string>

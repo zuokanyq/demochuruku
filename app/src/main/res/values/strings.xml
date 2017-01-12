@@ -976,6 +976,12 @@
     <string name="input_btn_submit">Submit</string>
     <string name="input_btn_clear">Clear</string>
 
+    <string name="msg_batchNo_empty">Scan BatchNO please!</string>
+    <string name="msg_LocationNO_empty">Scan LocationNo please!</string>
+    <string name="msg_submit_success">Submit Success</string>
+    <string name="msg_submit_fault">Submit Fault</string>
+
+
     <!--login-->
     <string name="Account">Account:</string>
     <string name="Password">Password:</string>
