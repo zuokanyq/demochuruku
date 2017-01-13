@@ -6,10 +6,9 @@ import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Xml;
 
-import com.example.timingsystem.helper.InputServer;
+import com.example.timingsystem.helper.DatabaseServer;
 import com.example.timingsystem.model.InputBatch;
-import com.example.timingsystem.model.InputLocation;
-import com.example.timingsystem.services.InputIntentService;
+import com.example.timingsystem.model.Location;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,12 +34,12 @@ import static org.junit.Assert.assertThat;
 @RunWith(AndroidJUnit4.class)
 @SmallTest
 public class TestInputxml {
-    private InputServer inputServer;
+    private DatabaseServer inputServer;
 
     @Before
     public void createInputServer() {
         Context appContext = InstrumentationRegistry.getTargetContext();
-        inputServer = new InputServer(appContext);
+        inputServer = new DatabaseServer(appContext);
     }
 
 
@@ -81,11 +80,11 @@ public class TestInputxml {
 
             InputBatch inputBatch = new InputBatch();
             inputBatch.setBatchno("RE4332R09_"+String.valueOf(j));
-            inputBatch.setLocationList(new ArrayList<InputLocation>());
+            inputBatch.setLocationList(new ArrayList<Location>());
             for (int i=0;i<3;i++){
-                InputLocation inputLocation=new InputLocation();
-                inputLocation.setLocationno("LocatNo_"+String.valueOf(j)+"_"+String.valueOf(i));
-                inputBatch.getLocationList().add(inputLocation);
+                Location location =new Location();
+                location.setLocationno("LocatNo_"+String.valueOf(j)+"_"+String.valueOf(i));
+                inputBatch.getLocationList().add(location);
             }
             long id= inputServer.createInputBatch(inputBatch);
         }
@@ -93,7 +92,7 @@ public class TestInputxml {
 
     private InputBatch getInputBatch(String xmlStr){
         InputBatch inputbatch=null;
-        List<InputLocation> locationlist=null;
+        List<Location> locationlist=null;
         XmlPullParser pullParser = Xml.newPullParser();
         StringReader reader = new StringReader(xmlStr);
 
@@ -110,11 +109,11 @@ public class TestInputxml {
                             inputbatch.setBatchno(pullParser.nextText());
                         }
                         if("StockNO".equals(pullParser.getName())){
-                            locationlist=new ArrayList<InputLocation>();
+                            locationlist=new ArrayList<Location>();
                         }
                         if(locationlist!=null){
                             if("NO".equals(pullParser.getName())){
-                                InputLocation location = new InputLocation();
+                                Location location = new Location();
                                 location.setLocationno(pullParser.nextText());
                                 locationlist.add(location);
                             }
@@ -165,7 +164,7 @@ public class TestInputxml {
 
                 serializer.startTag(null, "StockNO");  //库位信息
                 if(!inputbatch.getLocationList().isEmpty()){
-                    for(InputLocation location: inputbatch.getLocationList()){
+                    for(Location location: inputbatch.getLocationList()){
                         serializer.startTag(null, "NO");
                         serializer.text(location.getLocationno());
                         serializer.endTag(null, "NO");

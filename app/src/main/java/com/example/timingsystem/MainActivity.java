@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.example.timingsystem.fragment.ErDSoftScanFragment;
 import com.example.timingsystem.fragment.ErDSoftSetFragment;
 import com.example.timingsystem.fragment.InputFragment;
+import com.example.timingsystem.fragment.OutputFragment;
 import com.example.timingsystem.fragment.TestFragment;
 import com.example.timingsystem.services.LongRunningService;
 import com.rscja.utility.StringUtility;
@@ -56,12 +57,12 @@ public class MainActivity extends BaseTabFragmentActivity {
 
 	@Override
 	protected void initViewPageData() {
-		lstFrg.add(new ErDSoftScanFragment());
 		lstFrg.add(new InputFragment());
+		lstFrg.add(new OutputFragment());
 		lstFrg.add(new TestFragment());
 
-		lstTitles.add(getString(R.string.er_dsoft_tab_scan));
 		lstTitles.add(getString(R.string.er_dsoft_tab_input));
+		lstTitles.add(getString(R.string.er_dsoft_tab_output));
 		lstTitles.add(getString(R.string.er_dsoft_tab_set));
 	}
 	

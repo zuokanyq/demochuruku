@@ -7,26 +7,27 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.timingsystem.model.InputBatch;
-import com.example.timingsystem.model.InputLocation;
+import com.example.timingsystem.model.Location;
+import com.example.timingsystem.model.OutputBatch;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by MELLY on 2017-1-5.
+ * Created by zuokanyq on 2017-1-5.
  */
 
-public class InputServer {
+public class DatabaseServer {
 
     private DatabaseHelper dbHelper;
 
-    public InputServer(Context context)
+    public DatabaseServer(Context context)
     {
         this.dbHelper = new DatabaseHelper(context);
     }
 
-    private static final String LOG = "InputServer";
+    private static final String LOG = "DatabaseServer";
 
     /*
 * Creating a input_batch
@@ -40,13 +41,13 @@ public class InputServer {
             values.put(dbHelper.KEY_BATCHNO, inputBatch.getBatchno());
             // insert row
             batch_id = db.insert(dbHelper.TABLE_INPUT_BATCH, null, values);
-            List<InputLocation> locationList=inputBatch.getLocationList();
+            List<Location> locationList=inputBatch.getLocationList();
             if(locationList != null){
 
-                for (InputLocation inputLocation : locationList) {
+                for (Location location : locationList) {
                     ContentValues locationvalues = new ContentValues();
                     locationvalues.put(dbHelper.KEY_BATCHID, batch_id);
-                    locationvalues.put(dbHelper.KEY_LOCATIONNO,inputLocation.getLocationno());
+                    locationvalues.put(dbHelper.KEY_LOCATIONNO, location.getLocationno());
                     db.insert(dbHelper.TABLE_INPUT_LOCATION,null,locationvalues);
                 }
             }
@@ -83,7 +84,7 @@ public class InputServer {
 
         inputBatch.setInputtime(Timestamp.valueOf(strinputtime));
 
-        inputBatch.setLocationList(getLocationList(c.getInt(c.getColumnIndex(dbHelper.KEY_ID))));
+        inputBatch.setLocationList(getLocationList(c.getInt(c.getColumnIndex(dbHelper.KEY_ID)),dbHelper.TABLE_INPUT_LOCATION));
 
         return inputBatch;
     }
@@ -111,7 +112,7 @@ public class InputServer {
 
                 inputBatch.setInputtime(Timestamp.valueOf(strinputtime));
 
-                inputBatch.setLocationList(getLocationList(c.getInt(c.getColumnIndex(dbHelper.KEY_ID))));
+                inputBatch.setLocationList(getLocationList(c.getInt(c.getColumnIndex(dbHelper.KEY_ID)),dbHelper.TABLE_INPUT_LOCATION));
 
                 inputBatchList.add(inputBatch);
             } while (c.moveToNext());
@@ -126,10 +127,10 @@ public class InputServer {
      * @param batchid
      * @return
      */
-    public  List<InputLocation> getLocationList(int batchid){
+    public  List<Location> getLocationList(int batchid, String tablename){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        List<InputLocation> locationList = new ArrayList<InputLocation>();
-        String queryLocation = "SELECT  * FROM " + dbHelper.TABLE_INPUT_LOCATION + " WHERE "
+        List<Location> locationList = new ArrayList<Location>();
+        String queryLocation = "SELECT  * FROM " + tablename + " WHERE "
                 + dbHelper.KEY_BATCHID + " = " + batchid;
 
         Log.e(LOG, queryLocation);
@@ -137,7 +138,7 @@ public class InputServer {
         // looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
-                InputLocation location = new InputLocation();
+                Location location = new Location();
                 location.setId(c.getInt(c.getColumnIndex(dbHelper.KEY_ID)));
                 location.setBatchid(c.getInt(c.getColumnIndex(dbHelper.KEY_BATCHID)));
                 location.setLocationno(c.getString(c.getColumnIndex(dbHelper.KEY_LOCATIONNO)));
@@ -149,7 +150,7 @@ public class InputServer {
     }
 
     /*
- * 批量删除
+ * 批量删除入库数据
  */
     public void deleteInputBatch(List<InputBatch> inputBatchList) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -159,6 +160,92 @@ public class InputServer {
                 db.delete(dbHelper.TABLE_INPUT_LOCATION, dbHelper.KEY_BATCHID + " = ?",
                         new String[] { String.valueOf(inputBatch.getId()) });
                 db.delete(dbHelper.TABLE_INPUT_BATCH, dbHelper.KEY_ID + " = ?",
+                        new String[] { String.valueOf(inputBatch.getId()) });
+            }
+            db.setTransactionSuccessful(); //事务执行成功
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+
+    }
+
+    /*
+* Creating a OUTput_batch
+*/
+    public long createOutputBatch(OutputBatch outputBatch) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long batch_id = 0;
+        db.beginTransaction(); //开启事务
+        try {
+            ContentValues values = new ContentValues();
+            values.put(dbHelper.KEY_BATCHNO, outputBatch.getBatchno());
+            // insert row
+            batch_id = db.insert(dbHelper.TABLE_OUTPUT_BATCH, null, values);
+            List<Location> locationList=outputBatch.getLocationList();
+            if(locationList != null){
+
+                for (Location location : locationList) {
+                    ContentValues locationvalues = new ContentValues();
+                    locationvalues.put(dbHelper.KEY_BATCHID, batch_id);
+                    locationvalues.put(dbHelper.KEY_LOCATIONNO, location.getLocationno());
+                    db.insert(dbHelper.TABLE_OUTPUT_LOCATION,null,locationvalues);
+                }
+            }
+            db.setTransactionSuccessful(); //事务执行成功
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+
+        return batch_id;
+    }
+
+    /*
+   * get all OUTput_batch
+   */
+    public List<OutputBatch> getOutputBatchList() {
+        List<OutputBatch> outputBatchList=new ArrayList<OutputBatch>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String selectQuery = "SELECT  * FROM " + dbHelper.TABLE_OUTPUT_BATCH;
+
+        Log.e(LOG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+            do {
+
+                OutputBatch outputBatch = new OutputBatch();
+                outputBatch.setId(c.getInt(c.getColumnIndex(dbHelper.KEY_ID)));
+                outputBatch.setBatchno(c.getString(c.getColumnIndex(dbHelper.KEY_BATCHNO)));
+                String stroutputtime=c.getString(c.getColumnIndex(dbHelper.KEY_OUTPUTTIME));
+
+                outputBatch.setOutputtime(Timestamp.valueOf(stroutputtime));
+
+                outputBatch.setLocationList(getLocationList(c.getInt(c.getColumnIndex(dbHelper.KEY_ID)),dbHelper.TABLE_OUTPUT_LOCATION));
+
+                outputBatchList.add(outputBatch);
+            } while (c.moveToNext());
+        }
+
+        return outputBatchList;
+    }
+
+    /*
+* 批量删除出库数据
+*/
+    public void deleteoutputBatch(List<InputBatch> inputBatchList) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.beginTransaction(); //开启事务
+        try {
+            for (InputBatch inputBatch : inputBatchList){
+                db.delete(dbHelper.TABLE_OUTPUT_LOCATION, dbHelper.KEY_BATCHID + " = ?",
+                        new String[] { String.valueOf(inputBatch.getId()) });
+                db.delete(dbHelper.TABLE_OUTPUT_BATCH, dbHelper.KEY_ID + " = ?",
                         new String[] { String.valueOf(inputBatch.getId()) });
             }
             db.setTransactionSuccessful(); //事务执行成功

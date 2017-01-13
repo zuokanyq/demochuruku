@@ -7,26 +7,26 @@ import java.util.List;
  * Created by zuokanyq on 2017-1-4.
  */
 
-public class InputBatch {
+public class OutputBatch {
     int id;
     String batchno;
-    Timestamp inputtime;
+    Timestamp outputtime;
     int isfailed;
     String failedreason;
     List<Location> locationList;
 
     // constructors
-    public InputBatch() {
+    public OutputBatch() {
     }
 
-    public InputBatch(String batchno,Timestamp inputtime) {
+    public OutputBatch(String batchno, Timestamp outputtime) {
         this.batchno = batchno;
-        this.inputtime = inputtime;
+        this.outputtime = outputtime;
     }
-    public InputBatch(int id,String batchno,Timestamp inputtime){
+    public OutputBatch(int id, String batchno, Timestamp outputtime){
         this.id=id;
         this.batchno = batchno;
-        this.inputtime = inputtime;
+        this.outputtime = outputtime;
     }
 
     //getters and setters
@@ -48,12 +48,12 @@ public class InputBatch {
         this.batchno = batchno;
     }
 
-    public Timestamp getInputtime() {
-        return inputtime;
+    public Timestamp getOutputtime() {
+        return outputtime;
     }
 
-    public void setInputtime(Timestamp inputtime) {
-        this.inputtime = inputtime;
+    public void setOutputtime(Timestamp outputtime) {
+        this.outputtime = outputtime;
     }
 
     public int getIsfailed() {

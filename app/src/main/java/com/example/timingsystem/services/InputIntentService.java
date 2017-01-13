@@ -4,14 +4,14 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Xml;
 
 import com.example.timingsystem.Constants;
-import com.example.timingsystem.helper.InputServer;
+import com.example.timingsystem.helper.DatabaseServer;
 import com.example.timingsystem.model.InputBatch;
-import com.example.timingsystem.model.InputLocation;
+import com.example.timingsystem.model.Location;
+import com.example.timingsystem.model.OutputBatch;
 
 import org.ksoap2.serialization.SoapObject;
 import org.xmlpull.v1.XmlPullParser;
@@ -38,22 +38,23 @@ public class InputIntentService extends IntentService {
     private static final String ACTION_PUSHINPUT = "com.example.timingsystem.services.action.PUSHINPUT";
     private static final String ACTION_GETDATA = "com.example.timingsystem.services.action.GETDATA";
     private static final String ACTION_SAVEINPUT = "com.example.timingsystem.services.action.SAVEINPUT";
+    private static final String ACTION_SAVEOUTPUT = "com.example.timingsystem.services.action.SAVEOUTPUT";
 
     // TODO: Rename parameters
     private static final String EXTRA_BATCHNO = "com.example.timingsystem.services.extra.BATCHNO";
     private static final String EXTRA_LOCATIONNOS = "com.example.timingsystem.services.extra.LOCATIONNOS";
 
-    private InputServer inputServer;
+    private DatabaseServer databaseServer;
     private SharedPreferences pref;
 
     public InputIntentService() {
         super("InputIntentService");
-        inputServer=new InputServer(this);
+        databaseServer=new DatabaseServer(this);
   //      pref = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     /**
-     * Starts this service to perform action Foo with the given parameters. If
+     * Starts this service to perform action PushInput with the given parameters. If
      * the service is already performing a task this action will be queued.
      *
      * @see IntentService
@@ -66,7 +67,7 @@ public class InputIntentService extends IntentService {
     }
 
     /**
-     * Starts this service to perform action Baz with the given parameters. If
+     * Starts this service to perform action GetData with the given parameters. If
      * the service is already performing a task this action will be queued.
      *
      * @see IntentService
@@ -81,10 +82,8 @@ public class InputIntentService extends IntentService {
     }
 
     /**
-     * Starts this service to perform action Baz with the given parameters. If
+     * Starts this service to perform action SaveInput with the given parameters. If
      * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
      */
     // TODO: Customize helper method
     public static void startActionSaveInput(Context context, String batchNo, String locationNos) {
@@ -93,6 +92,18 @@ public class InputIntentService extends IntentService {
         intent.setAction(ACTION_SAVEINPUT);
         intent.putExtra(EXTRA_BATCHNO, batchNo);
         intent.putExtra(EXTRA_LOCATIONNOS, locationNos);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to perform action SaveOutput with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     */
+    public static void startActionSaveOutput(Context context, String batchNo) {
+        Intent intent = new Intent(context, InputIntentService.class);
+
+        intent.setAction(ACTION_SAVEOUTPUT);
+        intent.putExtra(EXTRA_BATCHNO, batchNo);
         context.startService(intent);
     }
 
@@ -108,8 +119,10 @@ public class InputIntentService extends IntentService {
             } else if (ACTION_SAVEINPUT.equals(action)) {
                 final String batchNO = intent.getStringExtra(EXTRA_BATCHNO);
                 final String locationNos = intent.getStringExtra(EXTRA_LOCATIONNOS);
-
                 handleActionSaveInput(batchNO,locationNos);
+            } else if (ACTION_SAVEOUTPUT.equals(action)) {
+                final String batchNO = intent.getStringExtra(EXTRA_BATCHNO);
+                handleActionSaveOutput(batchNO);
             }
         }
     }
@@ -120,40 +133,25 @@ public class InputIntentService extends IntentService {
      */
     private void handleActionPushInput() {
         // TODO: Handle action PushInput
-        //debug
         insertInputData();
-        //
-
-        List<InputBatch> inputBatchList=inputServer.getInputBatchList();
-
-        //debug
-        Integer size1=inputBatchList.size();
-        //size1=3
-
+        List<InputBatch> inputBatchList=databaseServer.getInputBatchList();
         String inputxml = generateXml(inputBatchList);
-
         String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
         String webMethName = "Input";
         Map<String, String> paramsmap=new HashMap<String, String>();
         paramsmap.put("InputSend",inputxml);
-
-        //debug
-     //   String obj="success";
         SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
 
         if("Success".equals(obj.getProperty("resMsg"))){
             InputBatch inputBatch= parseSoapObject(obj);
-            inputServer.deleteInputBatch(inputBatchList);
+            databaseServer.deleteInputBatch(inputBatchList);
         }else if ("Error".equals((obj.getProperty("resMsg")))){
             //Webservice 调用过程中出错
         }
         else{
 
         }
-        List<InputBatch> inputBatchListend=inputServer.getInputBatchList();
-        //debug
-        Integer size2=inputBatchListend.size();
-        //size2=0
+
     }
 
     /**
@@ -172,17 +170,17 @@ public class InputIntentService extends IntentService {
         // TODO: Handle action SaveInput
         InputBatch inputBatch = new InputBatch();
         inputBatch.setBatchno(batchno);
-        inputBatch.setLocationList(new ArrayList<InputLocation>());
+        inputBatch.setLocationList(new ArrayList<Location>());
         String[] locationNos = locationNo.split("\n");
         for(String locNo:locationNos){
             if (!locNo.isEmpty()) {
-                InputLocation location = new InputLocation();
+                Location location = new Location();
                 location.setLocationno(locNo);
                 inputBatch.getLocationList().add(location);
             }
         }
 
-        long id= inputServer.createInputBatch(inputBatch);
+        long id= databaseServer.createInputBatch(inputBatch);
 
 
         if (id>0){
@@ -201,25 +199,43 @@ public class InputIntentService extends IntentService {
 
     }
 
+    /**
+     * Handle action SaveInput in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionSaveOutput(String batchno) {
+        // TODO: Handle action SaveInput
+        OutputBatch outputBatch = new OutputBatch();
+        outputBatch.setBatchno(batchno);
+        long id= databaseServer.createOutputBatch(outputBatch);
+        if (id>0){
+            Intent localIntent =
+                    new Intent(Constants.ACTION_SAVEOUTPUT)
+                            .putExtra(Constants.EXTENDED_DATA_STATUS, Constants.RES_SUCCEES);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
+        }
+
+    }
+
 
     private void insertInputData(){
         for (int j=0;j<3;j++){
 
             InputBatch inputBatch = new InputBatch();
             inputBatch.setBatchno("RE4332R09_"+String.valueOf(j));
-            inputBatch.setLocationList(new ArrayList<InputLocation>());
+            inputBatch.setLocationList(new ArrayList<Location>());
             for (int i=0;i<3;i++){
-                InputLocation inputLocation=new InputLocation();
-                inputLocation.setLocationno("LocatNo_"+String.valueOf(j)+"_"+String.valueOf(i));
-                inputBatch.getLocationList().add(inputLocation);
+                Location location =new Location();
+                location.setLocationno("LocatNo_"+String.valueOf(j)+"_"+String.valueOf(i));
+                inputBatch.getLocationList().add(location);
             }
-            long id= inputServer.createInputBatch(inputBatch);
+            long id= databaseServer.createInputBatch(inputBatch);
         }
     }
 
     private InputBatch getInputBatch(String xmlStr){
         InputBatch inputbatch=null;
-        List<InputLocation> locationlist=null;
+        List<Location> locationlist=null;
         XmlPullParser pullParser = Xml.newPullParser();
         StringReader reader = new StringReader(xmlStr);
 
@@ -236,11 +252,11 @@ public class InputIntentService extends IntentService {
                             inputbatch.setBatchno(pullParser.nextText());
                         }
                         if("StockNO".equals(pullParser.getName())){
-                            locationlist=new ArrayList<InputLocation>();
+                            locationlist=new ArrayList<Location>();
                         }
                         if(locationlist!=null){
                             if("NO".equals(pullParser.getName())){
-                                InputLocation location = new InputLocation();
+                                Location location = new Location();
                                 location.setLocationno(pullParser.nextText());
                                 locationlist.add(location);
                             }
@@ -290,7 +306,7 @@ public class InputIntentService extends IntentService {
 
                 serializer.startTag(null, "StockNO");  //库位信息
                 if(!inputbatch.getLocationList().isEmpty()){
-                    for(InputLocation location: inputbatch.getLocationList()){
+                    for(Location location: inputbatch.getLocationList()){
                         serializer.startTag(null, "NO");
                         serializer.text(location.getLocationno());
                         serializer.endTag(null, "NO");
@@ -316,9 +332,9 @@ public class InputIntentService extends IntentService {
         SoapObject returnobj = (SoapObject)obj.getProperty("OutputQueryReturn");
         inputBatch.setBatchno(returnobj.getProperty("LotNO").toString());
         SoapObject locationsobj = (SoapObject)returnobj.getProperty("StockNO");
-        List<InputLocation> locationList = new ArrayList<InputLocation>();
+        List<Location> locationList = new ArrayList<Location>();
         for(int i=0; i<locationsobj.getPropertyCount();i++){
-            InputLocation location = new InputLocation();
+            Location location = new Location();
             location.setLocationno(locationsobj.getProperty(i).toString());
             locationList.add(location);
         }

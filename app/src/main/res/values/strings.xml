@@ -957,6 +957,7 @@
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="er_dsoft_tab_scan">Scan</string>
     <string name="er_dsoft_tab_input">Input</string>
+    <string name="er_dsoft_tab_output">Output</string>
     <string name="er_dsoft_tab_pic">Picture</string>
     <string name="er_dsoft_tab_set">Config</string>
     <string name="er_dsoft_get_img_data_fail">Get the image data failed</string>

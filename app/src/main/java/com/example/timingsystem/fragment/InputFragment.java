@@ -6,28 +6,22 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.timingsystem.Constants;
-import com.example.timingsystem.LoginActivity;
 import com.example.timingsystem.MainActivity;
 import com.example.timingsystem.R;
-import com.example.timingsystem.helper.InputServer;
 import com.example.timingsystem.services.InputIntentService;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
-import com.rscja.utility.StringUtility;
 import com.zebra.adc.decoder.Barcode2DWithSoft;
 
 import java.io.UnsupportedEncodingException;
@@ -208,7 +202,7 @@ public class InputFragment extends KeyDwonFragment {
             return;
         }
 
-        InputIntentService.startActionSaveInput(mContext,tv_batch_number.getText().toString(),tv_Result.getText().toString());
+        InputIntentService.startActionSaveInput(mContext,BatchNo,locationNos);
 
        /* Toast.makeText(getActivity(),
                 R.string.msg_submit_success,

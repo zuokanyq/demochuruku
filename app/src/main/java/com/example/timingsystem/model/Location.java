@@ -4,22 +4,22 @@ package com.example.timingsystem.model;
  * Created by zuokanyq on 2017-1-4.
  */
 
-public class InputLocation {
+public class Location {
     int id;
     int batchid;
     String locationno;
 
     // constructors
-    public InputLocation() {
+    public Location() {
     }
 
-    public InputLocation(int batchid,String locationno) {
+    public Location(int batchid, String locationno) {
         this.batchid=batchid;
         this.locationno=locationno;
     }
 
 
-    public InputLocation(int id,int batchid,String locationno) {
+    public Location(int id, int batchid, String locationno) {
         this.id=id;
         this.batchid=batchid;
         this.locationno=locationno;
