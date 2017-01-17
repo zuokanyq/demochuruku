@@ -972,13 +972,15 @@
     <!--input-->
     <string name="input_batch_number">Batch Number</string>
     <string name="input_location_number">Location Number</string>
-    <string name="input_btn_start_scan">Start Scan</string>
-    <string name="input_btn_stop_scan">Stop Scan</string>
+    <string name="input_btn_location_scan">Scan Location</string>
+    <string name="input_btn_location_clear">Clear Location</string>
+    <string name="input_btn_location_clearlast">Clear last Location</string>
     <string name="input_btn_submit">Submit</string>
     <string name="input_btn_clear">Clear</string>
 
     <string name="msg_batchNo_empty">Scan BatchNO please!</string>
     <string name="msg_LocationNO_empty">Scan LocationNo please!</string>
+    <string name="msg_LocationNO_notscan">Scan all LocationNo please!</string>
     <string name="msg_submit_success">Submit Success</string>
     <string name="msg_submit_fault">Submit Fault</string>
 

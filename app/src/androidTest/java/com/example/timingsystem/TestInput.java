@@ -8,6 +8,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.example.timingsystem.helper.DatabaseServer;
 import com.example.timingsystem.model.InputBatch;
 import com.example.timingsystem.model.Location;
+import com.example.timingsystem.model.OutputBatch;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -62,6 +63,34 @@ public class TestInput {
 
         List<InputBatch> inputBatchListno= inputServer.getInputBatchList();
         assertThat(inputBatchListno.size(), is(0));
+    }
+
+    @Test
+    public void insertOutputBatch() {
+        OutputBatch outputBatch = new OutputBatch();
+        outputBatch.setBatchno("RE4332R09");
+        outputBatch.setLocationList(new ArrayList<Location>());
+        for (int i=0;i<3;i++){
+            Location location =new Location();
+            location.setLocationno("LocatNo"+String.valueOf(i));
+            outputBatch.getLocationList().add(location);
+        }
+        long id= inputServer.createOutputBatch(outputBatch);
+
+        assertThat(id, is(notNullValue()));
+
+        List<OutputBatch> outputBatchList= inputServer.getOutputBatchList();
+
+
+        // Verify that the received data is correct.
+        assertThat(outputBatchList.size(), is(1));
+        assertThat(outputBatchList.get(0).getBatchno(), is("RE4332R09"));
+        assertThat(outputBatchList.get(0).getLocationList().size(), is(3));
+
+        inputServer.deleteOutputBatch(outputBatchList);
+
+        List<OutputBatch> outputBatchListno= inputServer.getOutputBatchList();
+        assertThat(outputBatchListno.size(), is(0));
     }
 
 }

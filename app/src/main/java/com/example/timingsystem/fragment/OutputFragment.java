@@ -1,26 +1,20 @@
 package com.example.timingsystem.fragment;
 
-import android.app.LoaderManager;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.Loader;
-import android.database.Cursor;
-import android.database.MatrixCursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -30,6 +24,7 @@ import com.example.timingsystem.Constants;
 import com.example.timingsystem.MainActivity;
 import com.example.timingsystem.R;
 import com.example.timingsystem.model.Location;
+import com.example.timingsystem.model.OutputBatch;
 import com.example.timingsystem.services.InputIntentService;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
@@ -38,7 +33,6 @@ import com.zebra.adc.decoder.Barcode2DWithSoft;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -59,9 +53,9 @@ public class OutputFragment extends KeyDwonFragment{
     @ViewInject(R.id.svResult)
     private ScrollView svResult;
     private String init_barcode;
-    int sussCount = 0;
+/*    int sussCount = 0;
     int failCount = 0;
-    int errorCount = 0;
+    int errorCount = 0;*/
 
     private boolean threadStop = true;
 
@@ -89,14 +83,6 @@ public class OutputFragment extends KeyDwonFragment{
 
             String strData = "";
 
-            if (length < 1) {
-
-                failCount += 1;
-                Toast.makeText(getActivity(),
-                        "",
-                        Toast.LENGTH_SHORT).show();
-                return;
-            }
             mContext.mReader.stopScan();
             String barCode = null;
             try {
@@ -119,12 +105,12 @@ public class OutputFragment extends KeyDwonFragment{
                 loc1.setLocationno("SZ");
                 loc1.setIsscan(false);
                 list.add(loc1);
-                for(int li=0;li<3;li++){
+               /* for(int li=0;li<3;li++){
                     Location loc=new Location();
                     loc.setLocationno("locno"+String.valueOf(li));
                     loc.setIsscan(false);
                     list.add(loc);
-                }
+                }*/
                 adapter.notifyDataSetChanged();
 
             }
@@ -137,8 +123,6 @@ public class OutputFragment extends KeyDwonFragment{
         super.onActivityCreated(savedInstanceState);
 
         mContext = (MainActivity) getActivity();
-
-
     }
 
     @Override
@@ -147,7 +131,6 @@ public class OutputFragment extends KeyDwonFragment{
         View v = inflater.inflate(R.layout.fragment_output,
                 container, false);
         ViewUtils.inject(this, v);
-//        listView=(ListView) v.findViewById(R.id.list_view);
         btn_Start= (Button) v.findViewById(R.id.btn_Location_Scan);
         btn_Start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,7 +166,16 @@ public class OutputFragment extends KeyDwonFragment{
 
      @OnClick(R.id.btn_Clear)
     public void btn_Clear_onClick(View v) {
-        clear();
+         AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
+                 .setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
+                     @Override
+                     public void onClick(DialogInterface dialog, int which) {
+                         clear();
+                     }
+                 })
+                 .setMessage("确认清空所有数据吗？").create();
+         dialog.show();
     }
 
     private void doDecode() {
@@ -207,22 +199,33 @@ public class OutputFragment extends KeyDwonFragment{
                     Toast.LENGTH_SHORT).show();
             return;
         }
-        InputIntentService.startActionSaveOutput(mContext,BatchNo);
+        for(Location location:list){
+            if(!location.getIsscan()){
+                Toast.makeText(getActivity(),
+                        R.string.msg_LocationNO_notscan,
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+        //确认窗
+        AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
+                .setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        InputIntentService.startActionSaveOutput(mContext,tv_batch_number.getText().toString());
+                    }
+                })
+                .setMessage("确认提交吗？").create();
+        dialog.show();
+
 
     }
-
-
 
     private void clear() {
         list.clear();
         adapter.notifyDataSetChanged();
         tv_batch_number.setText("");
-        int total = 0;
-        sussCount = 0;
-        failCount = 0;
-        errorCount = 0;
-
-        btn_Start.setText(getString(R.string.input_btn_start_scan));
         threadStop = true;
 
     }
@@ -246,15 +249,12 @@ public class OutputFragment extends KeyDwonFragment{
         isCurrFrag=false;
 
         threadStop = true;
-        btn_Start.setText(getString(R.string.input_btn_start_scan));
 
         btn_Clear.setEnabled(true);
 
         if (mContext.mReader != null) {
 
             mContext.mReader.stopScan();
-
-
         }
         LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mSubmitStateReceiver);
 
@@ -268,12 +268,8 @@ public class OutputFragment extends KeyDwonFragment{
 
         isCurrFrag=true;
         //动态注册广播接收器
-        IntentFilter statusIntentFilter = new IntentFilter(Constants.ACTION_SAVEINPUT);
-        // Adds a data filter for the HTTP scheme
-     //   statusIntentFilter.addDataScheme("http");
-        // Instantiates a new DownloadStateReceiver
+        IntentFilter statusIntentFilter = new IntentFilter(Constants.ACTION_SAVEOUTPUT);
         mSubmitStateReceiver = new SubmitStateReceiver();
-        // Registers the DownloadStateReceiver and its intent filters
         LocalBroadcastManager.getInstance(mContext).registerReceiver(
                 mSubmitStateReceiver,
                 statusIntentFilter);
@@ -283,8 +279,8 @@ public class OutputFragment extends KeyDwonFragment{
 
 
     @Override
-    public void myOnKeyDwon() {
-        isLocationNumber=true;
+    public void myOnKeyDwon(Boolean isScanKey) {
+        isLocationNumber=isScanKey;
         doDecode();
     }
 
@@ -299,7 +295,6 @@ public class OutputFragment extends KeyDwonFragment{
         public void onReceive(Context context, Intent intent) {
             String i="";
            if(Constants.RES_SUCCEES.equals(intent.getStringExtra(Constants.EXTENDED_DATA_STATUS))){
-
                Toast.makeText(getActivity(),
                        R.string.msg_submit_success,
                        Toast.LENGTH_SHORT).show();

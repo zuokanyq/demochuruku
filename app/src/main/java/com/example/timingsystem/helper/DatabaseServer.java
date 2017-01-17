@@ -238,15 +238,15 @@ public class DatabaseServer {
     /*
 * 批量删除出库数据
 */
-    public void deleteoutputBatch(List<InputBatch> inputBatchList) {
+    public void deleteOutputBatch(List<OutputBatch> outputBatchList) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction(); //开启事务
         try {
-            for (InputBatch inputBatch : inputBatchList){
+            for (OutputBatch outputBatch : outputBatchList){
                 db.delete(dbHelper.TABLE_OUTPUT_LOCATION, dbHelper.KEY_BATCHID + " = ?",
-                        new String[] { String.valueOf(inputBatch.getId()) });
+                        new String[] { String.valueOf(outputBatch.getId()) });
                 db.delete(dbHelper.TABLE_OUTPUT_BATCH, dbHelper.KEY_ID + " = ?",
-                        new String[] { String.valueOf(inputBatch.getId()) });
+                        new String[] { String.valueOf(outputBatch.getId()) });
             }
             db.setTransactionSuccessful(); //事务执行成功
         } catch (Exception e) {

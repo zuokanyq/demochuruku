@@ -86,7 +86,7 @@ public class TestFragment extends KeyDwonFragment {
 	}
 
 	@Override
-	public void myOnKeyDwon() {
+	public void myOnKeyDwon(Boolean isScanKey) {
 
 	}
 

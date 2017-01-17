@@ -942,13 +942,15 @@
     <!--input-->
     <string name="input_batch_number">批次号</string>
     <string name="input_location_number">库位号</string>
-    <string name="input_btn_start_scan">开始扫描</string>
-    <string name="input_btn_stop_scan">结束扫描</string>
-    <string name="input_btn_submit">确认</string>
+    <string name="input_btn_location_scan">扫描库位</string>
+    <string name="input_btn_location_clear">清空库位</string>
+    <string name="input_btn_location_clearlast">删除库位</string>
+    <string name="input_btn_submit">提交</string>
     <string name="input_btn_clear">清除</string>
 
     <string name="msg_batchNo_empty">请扫描批次号</string>
     <string name="msg_LocationNO_empty">请扫描库位号</string>
+    <string name="msg_LocationNO_notscan">请扫描所有库位号!</string>
     <string name="msg_submit_success">提交成功</string>
     <string name="msg_submit_fault">提交失败</string>
 

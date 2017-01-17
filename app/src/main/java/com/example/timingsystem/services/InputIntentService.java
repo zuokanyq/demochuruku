@@ -35,10 +35,10 @@ import java.util.Map;
 public class InputIntentService extends IntentService {
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_PUSHINPUT = "com.example.timingsystem.services.action.PUSHINPUT";
+/*    private static final String ACTION_PUSHINPUT = "com.example.timingsystem.services.action.PUSHINPUT";
     private static final String ACTION_GETDATA = "com.example.timingsystem.services.action.GETDATA";
     private static final String ACTION_SAVEINPUT = "com.example.timingsystem.services.action.SAVEINPUT";
-    private static final String ACTION_SAVEOUTPUT = "com.example.timingsystem.services.action.SAVEOUTPUT";
+    private static final String ACTION_SAVEOUTPUT = "com.example.timingsystem.services.action.SAVEOUTPUT";*/
 
     // TODO: Rename parameters
     private static final String EXTRA_BATCHNO = "com.example.timingsystem.services.extra.BATCHNO";
@@ -56,27 +56,21 @@ public class InputIntentService extends IntentService {
     /**
      * Starts this service to perform action PushInput with the given parameters. If
      * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
      */
-    // TODO: Customize helper method
     public static void startActionPushInput(Context context) {
         Intent intent = new Intent(context, InputIntentService.class);
-        intent.setAction(ACTION_PUSHINPUT);
+        intent.setAction(Constants.ACTION_PUSHINPUT);
         context.startService(intent);
     }
 
     /**
      * Starts this service to perform action GetData with the given parameters. If
      * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
      */
-    // TODO: Customize helper method
     public static void startActionGetData(Context context, String param1) {
         Intent intent = new Intent(context, InputIntentService.class);
 
-        intent.setAction(ACTION_SAVEINPUT);
+        intent.setAction(Constants.ACTION_SAVEINPUT);
         intent.putExtra(EXTRA_BATCHNO, param1);
         context.startService(intent);
     }
@@ -85,11 +79,10 @@ public class InputIntentService extends IntentService {
      * Starts this service to perform action SaveInput with the given parameters. If
      * the service is already performing a task this action will be queued.
      */
-    // TODO: Customize helper method
     public static void startActionSaveInput(Context context, String batchNo, String locationNos) {
         Intent intent = new Intent(context, InputIntentService.class);
 
-        intent.setAction(ACTION_SAVEINPUT);
+        intent.setAction(Constants.ACTION_SAVEINPUT);
         intent.putExtra(EXTRA_BATCHNO, batchNo);
         intent.putExtra(EXTRA_LOCATIONNOS, locationNos);
         context.startService(intent);
@@ -102,7 +95,7 @@ public class InputIntentService extends IntentService {
     public static void startActionSaveOutput(Context context, String batchNo) {
         Intent intent = new Intent(context, InputIntentService.class);
 
-        intent.setAction(ACTION_SAVEOUTPUT);
+        intent.setAction(Constants.ACTION_SAVEOUTPUT);
         intent.putExtra(EXTRA_BATCHNO, batchNo);
         context.startService(intent);
     }
@@ -111,16 +104,16 @@ public class InputIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
-            if (ACTION_PUSHINPUT.equals(action)) {
+            if (Constants.ACTION_PUSHINPUT.equals(action)) {
                 handleActionPushInput();
-            } else if (ACTION_GETDATA.equals(action)) {
+            } else if (Constants.ACTION_GETDATA.equals(action)) {
                 final String batchNO = intent.getStringExtra(EXTRA_BATCHNO);
                 handleActionGetData(batchNO);
-            } else if (ACTION_SAVEINPUT.equals(action)) {
+            } else if (Constants.ACTION_SAVEINPUT.equals(action)) {
                 final String batchNO = intent.getStringExtra(EXTRA_BATCHNO);
                 final String locationNos = intent.getStringExtra(EXTRA_LOCATIONNOS);
                 handleActionSaveInput(batchNO,locationNos);
-            } else if (ACTION_SAVEOUTPUT.equals(action)) {
+            } else if (Constants.ACTION_SAVEOUTPUT.equals(action)) {
                 final String batchNO = intent.getStringExtra(EXTRA_BATCHNO);
                 handleActionSaveOutput(batchNO);
             }
@@ -204,7 +197,7 @@ public class InputIntentService extends IntentService {
      * parameters.
      */
     private void handleActionSaveOutput(String batchno) {
-        // TODO: Handle action SaveInput
+        // TODO: Handle action SaveOutnput
         OutputBatch outputBatch = new OutputBatch();
         outputBatch.setBatchno(batchno);
         long id= databaseServer.createOutputBatch(outputBatch);

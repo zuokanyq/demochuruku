@@ -80,20 +80,41 @@ public class BaseTabFragmentActivity extends FragmentActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-        if (keyCode == 139) {
+        if (keyCode == 139) {  //扫描键
 
             if (event.getRepeatCount() == 0) {
 
                 if (mViewPager != null) {
 
                     KeyDwonFragment sf = (KeyDwonFragment) mViewPagerAdapter.getItem(mViewPager.getCurrentItem());
-                    sf.myOnKeyDwon();
+                    sf.myOnKeyDwon(true);
 
                 }
             }
             return true;
         }
+        if (keyCode == 137) {  //左侧边预留键
 
+            if (event.getRepeatCount() == 0) {
+
+                if (mViewPager != null) {
+
+                    KeyDwonFragment sf = (KeyDwonFragment) mViewPagerAdapter.getItem(mViewPager.getCurrentItem());
+                    sf.myOnKeyDwon(false);
+
+                }
+            }
+            return true;
+        }
+        if (keyCode == 136) {  //右侧边预留键
+
+        }
+        if (keyCode == 138) {  //预留功能键左侧
+
+        }
+        if (keyCode == 140) {  //预留功能键右侧
+
+        }
         return super.onKeyDown(keyCode, event);
     }
 }

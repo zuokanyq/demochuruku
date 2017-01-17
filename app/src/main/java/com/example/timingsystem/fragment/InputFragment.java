@@ -1,11 +1,14 @@
 package com.example.timingsystem.fragment;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,8 +32,6 @@ import java.io.UnsupportedEncodingException;
 
 public class InputFragment extends KeyDwonFragment {
 
-
-//    @ViewInject(R.id.btn_Start)
     private Button btn_Start;
     private Button btn_BnScan;
     @ViewInject(R.id.btn_Clear)
@@ -45,15 +46,8 @@ public class InputFragment extends KeyDwonFragment {
     private Thread thread;
     @ViewInject(R.id.svResult)
     private ScrollView svResult;
-  /*  @ViewInject(R.id.et_init_barcode)
-    private EditText et_init_barcode;*/
     private String init_barcode;
-    int sussCount = 0;
-    int failCount = 0;
-    int errorCount = 0;
-
     private boolean threadStop = true;
-
     private boolean isCurrFrag = false;
     private boolean isLocationNumber = false;
 
@@ -73,24 +67,6 @@ public class InputFragment extends KeyDwonFragment {
             }
 
             String strData = "";
-
-           /* if ((sussCount + errorCount + failCount) % 1000 == 0) {
-                tv_Result.setText("");
-            }*/
-
-            if (length < 1) {
-
-                failCount += 1;
-                Toast.makeText(getActivity(),
-                        "",
-                        Toast.LENGTH_SHORT).show();
-//                strData = getString(R.string.yid_msg_scan_fail) + "\n";
-//
-//                tv_Result.append(strData);
-
-
-                return;
-            }
 
             mContext.mReader.stopScan();
 
@@ -113,9 +89,6 @@ public class InputFragment extends KeyDwonFragment {
                 tv_batch_number.setText(barCode);
 
             }
-
-
-//            stat();
         }
     };
 
@@ -167,7 +140,36 @@ public class InputFragment extends KeyDwonFragment {
 
      @OnClick(R.id.btn_Clear)
     public void btn_Clear_onClick(View v) {
-        clear();
+         AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
+                 .setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
+                     @Override
+                     public void onClick(DialogInterface dialog, int which) {
+                         clear();
+                     }
+                 })
+                 .setMessage("确认清空所有数据吗？").create();
+         dialog.show();
+
+    }
+
+    @OnClick(R.id.btn_Location_Clear)
+    public void btn_location_Clear_onClick(View v) {
+        tv_Result.setText("");
+    }
+
+    @OnClick(R.id.btn_Location_Clearlast)
+    public void btn_location_Clearlast_onClick(View v){
+        String locationNo = tv_Result.getText().toString();
+        String resLoc="";
+        if(locationNo.indexOf("\n")>0){
+            locationNo=locationNo.substring(0,locationNo.length()-1);
+            if(locationNo.indexOf("\n")>0){
+                resLoc=locationNo.substring(0,locationNo.lastIndexOf("\n")+1);
+            }
+        }
+
+        tv_Result.setText(resLoc);
     }
 
     private void doDecode() {
@@ -202,25 +204,25 @@ public class InputFragment extends KeyDwonFragment {
             return;
         }
 
-        InputIntentService.startActionSaveInput(mContext,BatchNo,locationNos);
+        //确认窗
+        AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
+                .setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
-       /* Toast.makeText(getActivity(),
-                R.string.msg_submit_success,
-                Toast.LENGTH_SHORT).show();*/
-
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        InputIntentService.startActionSaveInput(mContext,tv_batch_number.getText().toString(),tv_Result.getText().toString());
+                    }
+                })
+                .setMessage("确认提交吗？").create();
+        dialog.show();
     }
 
 
 
     private void clear() {
+
         tv_Result.setText("");
         tv_batch_number.setText("");
-        int total = 0;
-        sussCount = 0;
-        failCount = 0;
-        errorCount = 0;
-
-        btn_Start.setText(getString(R.string.input_btn_start_scan));
         threadStop = true;
 
     }
@@ -244,7 +246,7 @@ public class InputFragment extends KeyDwonFragment {
         isCurrFrag=false;
 
         threadStop = true;
-        btn_Start.setText(getString(R.string.input_btn_start_scan));
+        btn_Start.setText(getString(R.string.input_btn_location_scan));
 
         btn_Clear.setEnabled(true);
 
@@ -281,8 +283,8 @@ public class InputFragment extends KeyDwonFragment {
 
 
     @Override
-    public void myOnKeyDwon() {
-        isLocationNumber=true;
+    public void myOnKeyDwon(Boolean isScanKey) {
+        isLocationNumber=isScanKey;
         doDecode();
     }
 
