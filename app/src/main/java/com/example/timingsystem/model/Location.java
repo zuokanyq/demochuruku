@@ -8,6 +8,7 @@ public class Location {
     int id;
     int batchid;
     String locationno;
+    Boolean isscan;
 
     // constructors
     public Location() {
@@ -49,5 +50,13 @@ public class Location {
 
     public void setLocationno(String locationno) {
         this.locationno = locationno;
+    }
+
+    public Boolean getIsscan() {
+        return isscan;
+    }
+
+    public void setIsscan(Boolean isscan) {
+        this.isscan = isscan;
     }
 }

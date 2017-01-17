@@ -927,7 +927,7 @@
     <string name="title_activity_er_dsoft">二维(软解)</string>
     <string name="er_dsoft_tab_scan">扫描</string>
     <string name="er_dsoft_tab_input">入库</string>
-    <string name="er_dsoft_tab_output">库</string>
+    <string name="er_dsoft_tab_output">出库</string>
     <string name="er_dsoft_tab_pic">拍照</string>
     <string name="er_dsoft_tab_set">设置</string>
 
