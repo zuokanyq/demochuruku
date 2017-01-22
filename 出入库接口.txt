@@ -1,0 +1,100 @@
+
+登陆
+<LoginSend>
+	<UserID>aaa</UserID>
+	<PassWord>111</PassWord>
+</LoginSend>
+
+<LoginReturn>
+	<Message>success/失败消息</Message>
+</LoginReturn>
+
+入库
+<InputSend>
+	<StockInfo>
+		<LotNO>111</LotNO>   <!--批次号---->
+		<UserID>aaa</UserID>
+		<InputDate>0000/00/00 00:00:00</InputDate>
+		<StockNO>
+			<NO>1-1-1-1</NO> <!--库位号-->
+			<NO>2-2-2-2</NO>
+			...
+		</StockNO>
+	</StockInfo>
+	<StockInfo>
+		<LotNO></LotNO>
+		<UserID>aaa</UserID>
+		<InputDate>0000/00/00 00:00:00</InputDate>
+		<StockNO>
+			<NO>1-1-1-1</NO>
+			<NO>2-2-2-2</NO>
+			...
+		</StockNO>
+	</StockInfo>
+</InputSend>
+
+<InputReturn>
+	<Message>success/失败消息</Message> <!--如果所有批次都入库成功，返回success, 否则返回失败消息-->
+	<Success>                            <!---无论是否所有批次都入库成功，这里都显示入库成功的批次-->
+		<SuccessLotNO></SuccessLotNO>
+		<SuccessLotNO></SuccessLotNO>
+		<SuccessLotNO></SuccessLotNO>
+		...
+	</Success>  
+	<Failed>                             <!--显示入库失败的批次-->
+		<FailedLotNO></FailedLotNO>
+		<FailedLotNO></FailedLotNO>
+		<FailedLotNO></FailedLotNO>
+		...
+	</Failed>
+</InputReturn>
+
+
+出库查询
+<OutputQuerySend>
+	<LotNO></LotNO>
+</OutputQuerySend>
+
+<OutputQueryReturn>
+	<LotNO></LotNO>
+	<StockNO>
+		<NO>1-1-1-1</NO>
+		<NO>2-2-2-2</NO>
+	</StockNO>
+</OutputQueryReturn>
+
+
+出库
+<OutputSend>
+	<StockInfo>
+		<LotNO>111</LotNO>   <!--批次号---->
+		<UserID>aaa</UserID>
+		<OutputDate>0000/00/00 00:00:00</OutputDate>
+		<StockNO>
+			<NO>1-1-1-1</NO> <!--库位号-->
+			<NO>2-2-2-2</NO>
+			...
+		</StockNO>
+	</StockInfo>
+	...
+</OutputSend>
+
+<OutputReturn>
+	<Message>success/失败消息</Message> <!--如果所有批次都出库成功，返回success, 否则返回失败消息-->
+	<Success>                            <!---无论是否所有批次都出库成功，这里都显示出库成功的批次-->
+		<SuccessLotNO></SuccessLotNO>
+		<SuccessLotNO></SuccessLotNO>
+		<SuccessLotNO></SuccessLotNO>
+		...
+	</Success>  
+	<Failed>                             <!--显示出库失败的批次-->
+		<FailedLotNO></FailedLotNO>
+		<FailedLotNO></FailedLotNO>
+		<FailedLotNO></FailedLotNO>
+		...
+	</Failed>
+</OutputReturn>
+
+
+
+
