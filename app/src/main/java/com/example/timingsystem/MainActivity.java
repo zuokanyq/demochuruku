@@ -8,11 +8,9 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.timingsystem.fragment.ErDSoftScanFragment;
-import com.example.timingsystem.fragment.ErDSoftSetFragment;
 import com.example.timingsystem.fragment.InputFragment;
 import com.example.timingsystem.fragment.OutputFragment;
-import com.example.timingsystem.fragment.TestFragment;
+import com.example.timingsystem.fragment.ReviewFragment;
 import com.example.timingsystem.services.LongRunningService;
 import com.rscja.utility.StringUtility;
 import com.zebra.adc.decoder.Barcode2DWithSoft;
@@ -38,6 +36,7 @@ public class MainActivity extends BaseTabFragmentActivity {
 		initViewPager();
 		initTabs();
 
+//		启动定时服务
 		Intent intent = new Intent(this, LongRunningService.class);
 		startService(intent);
 
@@ -59,15 +58,12 @@ public class MainActivity extends BaseTabFragmentActivity {
 	protected void initViewPageData() {
 		lstFrg.add(new InputFragment());
 		lstFrg.add(new OutputFragment());
-		lstFrg.add(new TestFragment());
+		lstFrg.add(new ReviewFragment());
 
 		lstTitles.add(getString(R.string.er_dsoft_tab_input));
 		lstTitles.add(getString(R.string.er_dsoft_tab_output));
 		lstTitles.add(getString(R.string.er_dsoft_tab_set));
 	}
-	
-	
-	
 
 	@Override
 	protected void onPause() {

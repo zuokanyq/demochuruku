@@ -930,6 +930,7 @@
     <string name="er_dsoft_tab_output">出库</string>
     <string name="er_dsoft_tab_pic">拍照</string>
     <string name="er_dsoft_tab_set">设置</string>
+    <string name="er_dsoft_tab_review">数据</string>
 
     <string name="er_dsoft_get_img_data_fail">获取图像数据失败</string>
     <string name="er_dsoft_get_img_succ">已保存图片到相册</string>
@@ -939,7 +940,7 @@
 
     <string name="er_dsoft_Set_succ">设置成功</string>
     <string name="er_dsoft_Set_fail">设置失败</string>
-    <!--input-->
+    <!--input/output-->
     <string name="input_batch_number">批次号</string>
     <string name="input_location_number">库位号</string>
     <string name="input_btn_location_scan">扫描库位</string>
@@ -947,6 +948,10 @@
     <string name="input_btn_location_clearlast">删除库位</string>
     <string name="input_btn_submit">提交</string>
     <string name="input_btn_clear">清除</string>
+
+    <!--review-->
+    <string name="review_input_batchNO">入库批次号</string>
+    <string name="review_output_batchNO">出库批次号</string>
 
     <string name="msg_batchNo_empty">请扫描批次号</string>
     <string name="msg_LocationNO_empty">请扫描库位号</string>

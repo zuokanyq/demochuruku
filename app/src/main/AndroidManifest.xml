@@ -12,8 +12,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+<!--    <uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -45,7 +46,12 @@
             </intent-filter>
         </service>
         <service android:name=".services.LongRunningService"></service>
-        <receiver android:name=".services.AlarmReceiver"/>
+        <receiver android:name=".receiver.AlarmReceiver"/>
+        <receiver android:name=".receiver.ConnectionChangeReceiver" android:label="NetworkConnection">
+        <intent-filter>
+        <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+        </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

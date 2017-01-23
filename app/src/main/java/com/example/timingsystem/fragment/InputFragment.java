@@ -59,10 +59,9 @@ public class InputFragment extends KeyDwonFragment {
         @Override
         public void onScanComplete(int i, int length, byte[] data) {
 
-            Log.i("ErDSoftScanFragment","onScanComplete() i="+i);
+            Log.i("ErDSoftScanFragment", "onScanComplete() i=" + i);
 
-            if(!isCurrFrag)
-            {
+            if (!isCurrFrag) {
                 return;
             }
 
@@ -72,12 +71,12 @@ public class InputFragment extends KeyDwonFragment {
 
             String barCode = null;
             try {
-                barCode = new String(data,"GBK").trim();
+                barCode = new String(data, "GBK").trim();
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
 
-            if(isLocationNumber) {
+            if (isLocationNumber) {
 
                 strData += barCode + "\n";
 
@@ -109,20 +108,20 @@ public class InputFragment extends KeyDwonFragment {
                 container, false);
         ViewUtils.inject(this, v);
 
-        btn_Start= (Button) v.findViewById(R.id.btn_Location_Scan);
+        btn_Start = (Button) v.findViewById(R.id.btn_Location_Scan);
         btn_Start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isLocationNumber=true;
+                isLocationNumber = true;
                 doDecode();
             }
         });
 
-        btn_BnScan=(Button)v.findViewById(R.id.btn_BnScan);
+        btn_BnScan = (Button) v.findViewById(R.id.btn_BnScan);
         btn_BnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isLocationNumber=false;
+                isLocationNumber = false;
                 doDecode();
             }
         });
@@ -138,18 +137,18 @@ public class InputFragment extends KeyDwonFragment {
         submit();
     }
 
-     @OnClick(R.id.btn_Clear)
+    @OnClick(R.id.btn_Clear)
     public void btn_Clear_onClick(View v) {
-         AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
-                 .setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
+                .setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
-                     @Override
-                     public void onClick(DialogInterface dialog, int which) {
-                         clear();
-                     }
-                 })
-                 .setMessage("确认清空所有数据吗？").create();
-         dialog.show();
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        clear();
+                    }
+                })
+                .setMessage("确认清空所有数据吗？").create();
+        dialog.show();
 
     }
 
@@ -159,13 +158,13 @@ public class InputFragment extends KeyDwonFragment {
     }
 
     @OnClick(R.id.btn_Location_Clearlast)
-    public void btn_location_Clearlast_onClick(View v){
+    public void btn_location_Clearlast_onClick(View v) {
         String locationNo = tv_Result.getText().toString();
-        String resLoc="";
-        if(locationNo.indexOf("\n")>0){
-            locationNo=locationNo.substring(0,locationNo.length()-1);
-            if(locationNo.indexOf("\n")>0){
-                resLoc=locationNo.substring(0,locationNo.lastIndexOf("\n")+1);
+        String resLoc = "";
+        if (locationNo.indexOf("\n") > 0) {
+            locationNo = locationNo.substring(0, locationNo.length() - 1);
+            if (locationNo.indexOf("\n") > 0) {
+                resLoc = locationNo.substring(0, locationNo.lastIndexOf("\n") + 1);
             }
         }
 
@@ -179,25 +178,25 @@ public class InputFragment extends KeyDwonFragment {
 
             mContext.mReader.setScanCallback(mScanCallback);
         }
-        Log.i("ErDSoftScanFragment","doDecode() threadStop="+threadStop);
+        Log.i("ErDSoftScanFragment", "doDecode() threadStop=" + threadStop);
 
-            thread = new DecodeThread();
-            thread.start();
+        thread = new DecodeThread();
+        thread.start();
 
     }
 
 
     private void submit() {
         String BatchNo = tv_batch_number.getText().toString();
-        if(BatchNo.isEmpty()){
+        if (BatchNo.isEmpty()) {
             Toast.makeText(getActivity(),
                     R.string.msg_batchNo_empty,
                     Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String locationNos=tv_Result.getText().toString();
-        if(locationNos.isEmpty()){
+        String locationNos = tv_Result.getText().toString();
+        if (locationNos.isEmpty()) {
             Toast.makeText(getActivity(),
                     R.string.msg_LocationNO_empty,
                     Toast.LENGTH_SHORT).show();
@@ -210,13 +209,12 @@ public class InputFragment extends KeyDwonFragment {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        InputIntentService.startActionSaveInput(mContext,tv_batch_number.getText().toString(),tv_Result.getText().toString());
+                        InputIntentService.startActionSaveInput(mContext, tv_batch_number.getText().toString(), tv_Result.getText().toString());
                     }
                 })
                 .setMessage("确认提交吗？").create();
         dialog.show();
     }
-
 
 
     private void clear() {
@@ -234,7 +232,7 @@ public class InputFragment extends KeyDwonFragment {
         @Override
         public void run() {
             super.run();
-                mContext.mReader.scan();
+            mContext.mReader.scan();
         }
 
     }
@@ -243,7 +241,7 @@ public class InputFragment extends KeyDwonFragment {
     public void onPause() {
         super.onPause();
 
-        isCurrFrag=false;
+        isCurrFrag = false;
 
         threadStop = true;
         btn_Start.setText(getString(R.string.input_btn_location_scan));
@@ -261,16 +259,15 @@ public class InputFragment extends KeyDwonFragment {
     }
 
 
-
     @Override
     public void onResume() {
         super.onResume();
 
-        isCurrFrag=true;
+        isCurrFrag = true;
         //动态注册广播接收器
         IntentFilter statusIntentFilter = new IntentFilter(Constants.ACTION_SAVEINPUT);
         // Adds a data filter for the HTTP scheme
-     //   statusIntentFilter.addDataScheme("http");
+        //   statusIntentFilter.addDataScheme("http");
         // Instantiates a new DownloadStateReceiver
         mSubmitStateReceiver = new SubmitStateReceiver();
         // Registers the DownloadStateReceiver and its intent filters
@@ -284,27 +281,27 @@ public class InputFragment extends KeyDwonFragment {
 
     @Override
     public void myOnKeyDwon(Boolean isScanKey) {
-        isLocationNumber=isScanKey;
+        isLocationNumber = isScanKey;
         doDecode();
     }
 
     // Broadcast receiver for receiving status updates from the IntentService
-    private class SubmitStateReceiver extends BroadcastReceiver
-    {
+    private class SubmitStateReceiver extends BroadcastReceiver {
         // Prevents instantiation
         private SubmitStateReceiver() {
         }
+
         // Called when the BroadcastReceiver gets an Intent it's registered to receive
         @Override
         public void onReceive(Context context, Intent intent) {
-            String i="";
-           if(Constants.RES_SUCCEES.equals(intent.getStringExtra(Constants.EXTENDED_DATA_STATUS))){
+            String i = "";
+            if (Constants.RES_SUCCEES.equals(intent.getStringExtra(Constants.EXTENDED_DATA_STATUS))) {
 
-               Toast.makeText(getActivity(),
-                       R.string.msg_submit_success,
-                       Toast.LENGTH_SHORT).show();
-               clear();
-           }
+                Toast.makeText(getActivity(),
+                        R.string.msg_submit_success,
+                        Toast.LENGTH_SHORT).show();
+                clear();
+            }
         /*
          * Handle Intents here.
          */

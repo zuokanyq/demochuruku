@@ -90,17 +90,79 @@ public class DatabaseServer {
     }
 
     /*
-    * get all input_batch
-    */
-    public List<InputBatch> getInputBatchList() {
-        List<InputBatch> inputBatchList=new ArrayList<InputBatch>();
+  * get single input_batch
+  */
+    public InputBatch getInputBatch(Integer id) {
+
+        String selectQuery = "SELECT  * FROM " + dbHelper.TABLE_INPUT_BATCH + " WHERE "
+                + dbHelper.KEY_ID + " = " + id.toString();
+        InputBatch inputBatch=null;
+        Log.e(LOG, selectQuery);
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c != null) {
+            c.moveToFirst();
+            inputBatch = new InputBatch();
+            inputBatch.setId(c.getInt(c.getColumnIndex(dbHelper.KEY_ID)));
+            inputBatch.setBatchno(c.getString(c.getColumnIndex(dbHelper.KEY_BATCHNO)));
+            String strinputtime = c.getString(c.getColumnIndex(dbHelper.KEY_INPUTTIME));
+
+            inputBatch.setInputtime(Timestamp.valueOf(strinputtime));
+
+            inputBatch.setLocationList(getLocationList(c.getInt(c.getColumnIndex(dbHelper.KEY_ID)), dbHelper.TABLE_INPUT_LOCATION));
+        }
+        return inputBatch;
+    }
+
+
+    /*
+  * get single input_batch
+  */
+    public OutputBatch getOutputBatch(Integer id) {
+
+        String selectQuery = "SELECT  * FROM " + dbHelper.TABLE_OUTPUT_BATCH + " WHERE "
+                + dbHelper.KEY_ID + " = " + id.toString();
+        OutputBatch outputBatch=null;
+        Log.e(LOG, selectQuery);
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c != null) {
+            c.moveToFirst();
+            outputBatch = new OutputBatch();
+            outputBatch.setId(c.getInt(c.getColumnIndex(dbHelper.KEY_ID)));
+            outputBatch.setBatchno(c.getString(c.getColumnIndex(dbHelper.KEY_BATCHNO)));
+            String strinputtime = c.getString(c.getColumnIndex(dbHelper.KEY_INPUTTIME));
+
+            outputBatch.setOutputtime(Timestamp.valueOf(strinputtime));
+
+            outputBatch.setLocationList(getLocationList(c.getInt(c.getColumnIndex(dbHelper.KEY_ID)), dbHelper.TABLE_INPUT_LOCATION));
+        }
+        return outputBatch;
+    }
+
+
+    /*批量获取入库数据*/
+    public Cursor queryInputBatch(){
+
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         String selectQuery = "SELECT  * FROM " + dbHelper.TABLE_INPUT_BATCH;
 
-        Log.e(LOG, selectQuery);
-
         Cursor c = db.rawQuery(selectQuery, null);
+        return c;
+    }
+
+    /*
+    * get all input_batch
+    */
+    public List<InputBatch> getInputBatchList() {
+        List<InputBatch> inputBatchList=new ArrayList<InputBatch>();
+
+        Cursor c = queryInputBatch();
 
         if (c.moveToFirst()) {
             do {
@@ -203,18 +265,24 @@ public class DatabaseServer {
         return batch_id;
     }
 
+
+    /*批量获取出库数据*/
+    public Cursor queryOutputBatch(){
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String selectQuery = "SELECT  * FROM " + dbHelper.TABLE_OUTPUT_BATCH;
+
+        Cursor c = db.rawQuery(selectQuery, null);
+        return c;
+    }
+
     /*
    * get all OUTput_batch
    */
     public List<OutputBatch> getOutputBatchList() {
         List<OutputBatch> outputBatchList=new ArrayList<OutputBatch>();
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        String selectQuery = "SELECT  * FROM " + dbHelper.TABLE_OUTPUT_BATCH;
-
-        Log.e(LOG, selectQuery);
-
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = queryOutputBatch();
 
         if (c.moveToFirst()) {
             do {
@@ -256,5 +324,9 @@ public class DatabaseServer {
         }
 
     }
+
+
+
+
 
 }

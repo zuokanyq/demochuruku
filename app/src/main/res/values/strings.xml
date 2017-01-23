@@ -960,6 +960,7 @@
     <string name="er_dsoft_tab_output">Output</string>
     <string name="er_dsoft_tab_pic">Picture</string>
     <string name="er_dsoft_tab_set">Config</string>
+    <string name="er_dsoft_tab_review">Review</string>
     <string name="er_dsoft_get_img_data_fail">Get the image data failed</string>
     <string name="er_dsoft_get_img_succ">Saved pictures to album</string>
     <string name="er_dsoft_get_ParamNum" translatable="false">ParamNum</string>
@@ -969,7 +970,7 @@
     <string name="er_dsoft_Set_succ">Set successfully</string>
     <string name="er_dsoft_Set_fail">Set failure</string>
     <string name="title_activity_main2">Main2Activity</string>
-    <!--input-->
+    <!--input\output-->
     <string name="input_batch_number">Batch Number</string>
     <string name="input_location_number">Location Number</string>
     <string name="input_btn_location_scan">Scan Location</string>
@@ -977,6 +978,11 @@
     <string name="input_btn_location_clearlast">Clear last Location</string>
     <string name="input_btn_submit">Submit</string>
     <string name="input_btn_clear">Clear</string>
+
+    <!--review-->
+    <string name="review_input_batchNO">Input Batch Number</string>
+    <string name="review_output_batchNO">Output Batch Number</string>
+
 
     <string name="msg_batchNo_empty">Scan BatchNO please!</string>
     <string name="msg_LocationNO_empty">Scan LocationNo please!</string>

@@ -35,12 +35,9 @@ import java.util.Map;
 public class InputIntentService extends IntentService {
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-/*    private static final String ACTION_PUSHINPUT = "com.example.timingsystem.services.action.PUSHINPUT";
-    private static final String ACTION_GETDATA = "com.example.timingsystem.services.action.GETDATA";
-    private static final String ACTION_SAVEINPUT = "com.example.timingsystem.services.action.SAVEINPUT";
-    private static final String ACTION_SAVEOUTPUT = "com.example.timingsystem.services.action.SAVEOUTPUT";*/
 
     // TODO: Rename parameters
+    private static final String EXTRA_ID = "com.example.timingsystem.services.extra.ID";
     private static final String EXTRA_BATCHNO = "com.example.timingsystem.services.extra.BATCHNO";
     private static final String EXTRA_LOCATIONNOS = "com.example.timingsystem.services.extra.LOCATIONNOS";
 
@@ -60,6 +57,16 @@ public class InputIntentService extends IntentService {
     public static void startActionPushInput(Context context) {
         Intent intent = new Intent(context, InputIntentService.class);
         intent.setAction(Constants.ACTION_PUSHINPUT);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to perform action PushOutput with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     */
+    public static void startActionPushOutput(Context context) {
+        Intent intent = new Intent(context, InputIntentService.class);
+        intent.setAction(Constants.ACTION_PUSHOUTPUT);
         context.startService(intent);
     }
 
@@ -100,12 +107,38 @@ public class InputIntentService extends IntentService {
         context.startService(intent);
     }
 
+    /**
+     * Starts this service to perform action SaveOutput with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     */
+    public static void startActionPushInputOne(Context context, Integer id) {
+        Intent intent = new Intent(context, InputIntentService.class);
+
+        intent.setAction(Constants.ACTION_PUSHINPUTONE);
+        intent.putExtra(EXTRA_ID, id);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to perform action SaveOutput with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     */
+    public static void startActionPushOutputOne(Context context, Integer id) {
+        Intent intent = new Intent(context, InputIntentService.class);
+
+        intent.setAction(Constants.ACTION_PUSHOUTPUTONE);
+        intent.putExtra(EXTRA_ID, id);
+        context.startService(intent);
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
             if (Constants.ACTION_PUSHINPUT.equals(action)) {
                 handleActionPushInput();
+            } else if (Constants.ACTION_PUSHOUTPUT.equals(action)) {
+                handleActionPushOutput();
             } else if (Constants.ACTION_GETDATA.equals(action)) {
                 final String batchNO = intent.getStringExtra(EXTRA_BATCHNO);
                 handleActionGetData(batchNO);
@@ -116,6 +149,12 @@ public class InputIntentService extends IntentService {
             } else if (Constants.ACTION_SAVEOUTPUT.equals(action)) {
                 final String batchNO = intent.getStringExtra(EXTRA_BATCHNO);
                 handleActionSaveOutput(batchNO);
+            } else if (Constants.ACTION_PUSHINPUTONE.equals(action)) {
+                final Integer id = intent.getIntExtra(EXTRA_ID,-1);
+                handleActionPushInputOne(id);
+            } else if (Constants.ACTION_PUSHOUTPUTONE.equals(action)) {
+                final Integer id = intent.getIntExtra(EXTRA_ID,-1);
+                handleActionPushOutputOne(id);
             }
         }
     }
@@ -126,14 +165,16 @@ public class InputIntentService extends IntentService {
      */
     private void handleActionPushInput() {
         // TODO: Handle action PushInput
-        insertInputData();
         List<InputBatch> inputBatchList=databaseServer.getInputBatchList();
+        if (inputBatchList.isEmpty()){
+            return;
+        }
         String inputxml = generateXml(inputBatchList);
         String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
         String webMethName = "Input";
         Map<String, String> paramsmap=new HashMap<String, String>();
         paramsmap.put("InputSend",inputxml);
-        SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
+       /* SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
 
         if("Success".equals(obj.getProperty("resMsg"))){
             InputBatch inputBatch= parseSoapObject(obj);
@@ -143,9 +184,88 @@ public class InputIntentService extends IntentService {
         }
         else{
 
+        }*/
+
+    }
+    /**
+     * Handle action PushInput in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionPushInputOne(Integer id) {
+        // TODO: Handle action PushInput
+        List<InputBatch> inputBatchList=new ArrayList<InputBatch>();
+        InputBatch inputBatch = databaseServer.getInputBatch(id);
+        if (inputBatch!=null){
+            inputBatchList.add(inputBatch);
+            String inputxml = generateXml(inputBatchList);
+            String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
+            String webMethName = "Input";
+            Map<String, String> paramsmap=new HashMap<String, String>();
+            paramsmap.put("InputSend",inputxml);
+           /* SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
+
+            if("Success".equals(obj.getProperty("resMsg"))){
+                InputBatch inputBatch= parseSoapObject(obj);
+                databaseServer.deleteInputBatch(inputBatchList);
+            }else if ("Error".equals((obj.getProperty("resMsg")))){
+                //Webservice 调用过程中出错
+            }
+            else{
+
+            }*/
         }
 
     }
+
+    /**
+     * Handle action PushInput in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionPushOutputOne(Integer id) {
+        // TODO: Handle action PushInput
+        List<OutputBatch> outputBatchList=new ArrayList<OutputBatch>();
+        OutputBatch outputBatch = databaseServer.getOutputBatch(id);
+        if (outputBatch!=null){
+            outputBatchList.add(outputBatch);
+            pushoutputXml(outputBatchList);
+
+        }
+
+    }
+
+    /**
+     * Handle action PushInput in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionPushOutput() {
+        // TODO: Handle action PushOutput
+        List<OutputBatch> outputBatchList=databaseServer.getOutputBatchList();
+        if (outputBatchList.isEmpty()){
+            return;
+        }
+        pushoutputXml(outputBatchList);
+
+    }
+
+    private void pushoutputXml(List<OutputBatch> outputBatchList){
+        String inputxml = generateOutputXml(outputBatchList);
+        String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
+        String webMethName = "Input";
+        Map<String, String> paramsmap=new HashMap<String, String>();
+        paramsmap.put("InputSend",inputxml);
+           /* SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
+
+            if("Success".equals(obj.getProperty("resMsg"))){
+                InputBatch inputBatch= parseSoapObject(obj);
+                databaseServer.deleteInputBatch(inputBatchList);
+            }else if ("Error".equals((obj.getProperty("resMsg")))){
+                //Webservice 调用过程中出错
+            }
+            else{
+
+            }*/
+    }
+
 
     /**
      * Handle action GetData in the provided background thread with the provided
@@ -211,20 +331,6 @@ public class InputIntentService extends IntentService {
     }
 
 
-    private void insertInputData(){
-        for (int j=0;j<3;j++){
-
-            InputBatch inputBatch = new InputBatch();
-            inputBatch.setBatchno("RE4332R09_"+String.valueOf(j));
-            inputBatch.setLocationList(new ArrayList<Location>());
-            for (int i=0;i<3;i++){
-                Location location =new Location();
-                location.setLocationno("LocatNo_"+String.valueOf(j)+"_"+String.valueOf(i));
-                inputBatch.getLocationList().add(location);
-            }
-            long id= databaseServer.createInputBatch(inputBatch);
-        }
-    }
 
     private InputBatch getInputBatch(String xmlStr){
         InputBatch inputbatch=null;
@@ -319,6 +425,54 @@ public class InputIntentService extends IntentService {
 
         return xml;
     }
+
+    private String generateOutputXml(List<OutputBatch> outputBatchList) {
+        String xml="";
+        XmlSerializer serializer = Xml.newSerializer();
+        StringWriter writer = new StringWriter();
+
+        try {
+            serializer.setOutput(writer);
+            serializer.startDocument("UTF-8",true);
+            serializer.startTag(null,"OutputSend");
+            for(OutputBatch outputbatch:outputBatchList){
+                serializer.startTag(null, "StockInfo");
+
+                serializer.startTag(null, "LotNO");
+                serializer.text(outputbatch.getBatchno());
+                serializer.endTag(null, "LotNO");
+
+                serializer.startTag(null, "UserID");
+                serializer.text("aaa");
+                serializer.endTag(null, "UserID");
+
+                serializer.startTag(null, "InputDate");
+                serializer.text(outputbatch.getOutputtime().toString());
+                serializer.endTag(null, "InputDate");
+
+                serializer.startTag(null, "StockNO");  //库位信息
+                if(!outputbatch.getLocationList().isEmpty()){
+                    for(Location location: outputbatch.getLocationList()){
+                        serializer.startTag(null, "NO");
+                        serializer.text(location.getLocationno());
+                        serializer.endTag(null, "NO");
+                    }
+                }
+                serializer.endTag(null, "StockNO");
+                serializer.endTag(null, "StockInfo");
+            }
+            serializer.endTag(null, "OutputSend");
+            serializer.endDocument();
+            xml=writer.toString();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            xml="error";
+        }
+
+        return xml;
+    }
+
 
     private InputBatch parseSoapObject(SoapObject obj){
         InputBatch inputBatch=new InputBatch();

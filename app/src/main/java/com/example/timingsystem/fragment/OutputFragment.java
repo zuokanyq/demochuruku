@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class OutputFragment extends KeyDwonFragment{
+public class OutputFragment extends KeyDwonFragment {
 
     private Button btn_Start;
     private Button btn_BnScan;
@@ -65,8 +65,6 @@ public class OutputFragment extends KeyDwonFragment{
     private MainActivity mContext;
 
     private SubmitStateReceiver mSubmitStateReceiver;
-
-    private android.support.v4.app.LoaderManager manager;
     private MyAdapter adapter;
     private List<Location> list;
 
@@ -74,10 +72,9 @@ public class OutputFragment extends KeyDwonFragment{
         @Override
         public void onScanComplete(int i, int length, byte[] data) {
 
-            Log.i("ErDSoftScanFragment","onScanComplete() i="+i);
+            Log.i("ErDSoftScanFragment", "onScanComplete() i=" + i);
 
-            if(!isCurrFrag)
-            {
+            if (!isCurrFrag) {
                 return;
             }
 
@@ -86,22 +83,21 @@ public class OutputFragment extends KeyDwonFragment{
             mContext.mReader.stopScan();
             String barCode = null;
             try {
-                barCode = new String(data,"GBK").trim();
+                barCode = new String(data, "GBK").trim();
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            if(isLocationNumber) {   //扫描库位号
+            if (isLocationNumber) {   //扫描库位号
                 strData += barCode;
-                for(Location loc:list)
-                {
-                   if ( strData.equals(loc.getLocationno()))
-                       loc.setIsscan(true);
+                for (Location loc : list) {
+                    if (strData.equals(loc.getLocationno()))
+                        loc.setIsscan(true);
                 }
                 adapter.notifyDataSetChanged();
             } else {    //扫描结果是批次号
                 tv_batch_number.setText(barCode);
                 list.clear();
-                Location loc1=new Location();
+                Location loc1 = new Location();
                 loc1.setLocationno("SZ");
                 loc1.setIsscan(false);
                 list.add(loc1);
@@ -131,24 +127,24 @@ public class OutputFragment extends KeyDwonFragment{
         View v = inflater.inflate(R.layout.fragment_output,
                 container, false);
         ViewUtils.inject(this, v);
-        btn_Start= (Button) v.findViewById(R.id.btn_Location_Scan);
+        btn_Start = (Button) v.findViewById(R.id.btn_Location_Scan);
         btn_Start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isLocationNumber=true;
+                isLocationNumber = true;
                 doDecode();
             }
         });
 
-        btn_BnScan=(Button)v.findViewById(R.id.btn_BnScan);
+        btn_BnScan = (Button) v.findViewById(R.id.btn_BnScan);
         btn_BnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isLocationNumber=false;
+                isLocationNumber = false;
                 doDecode();
             }
         });
-        manager = getLoaderManager();
+
         list = new ArrayList<Location>();
         adapter = new MyAdapter();
         listView.setAdapter(adapter);
@@ -164,18 +160,18 @@ public class OutputFragment extends KeyDwonFragment{
         submit();
     }
 
-     @OnClick(R.id.btn_Clear)
+    @OnClick(R.id.btn_Clear)
     public void btn_Clear_onClick(View v) {
-         AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
-                 .setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
+                .setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
-                     @Override
-                     public void onClick(DialogInterface dialog, int which) {
-                         clear();
-                     }
-                 })
-                 .setMessage("确认清空所有数据吗？").create();
-         dialog.show();
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        clear();
+                    }
+                })
+                .setMessage("确认清空所有数据吗？").create();
+        dialog.show();
     }
 
     private void doDecode() {
@@ -193,14 +189,14 @@ public class OutputFragment extends KeyDwonFragment{
     private void submit() {
         //输入校验
         String BatchNo = tv_batch_number.getText().toString();
-        if(BatchNo.isEmpty()){
+        if (BatchNo.isEmpty()) {
             Toast.makeText(getActivity(),
                     R.string.msg_batchNo_empty,
                     Toast.LENGTH_SHORT).show();
             return;
         }
-        for(Location location:list){
-            if(!location.getIsscan()){
+        for (Location location : list) {
+            if (!location.getIsscan()) {
                 Toast.makeText(getActivity(),
                         R.string.msg_LocationNO_notscan,
                         Toast.LENGTH_SHORT).show();
@@ -213,7 +209,7 @@ public class OutputFragment extends KeyDwonFragment{
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        InputIntentService.startActionSaveOutput(mContext,tv_batch_number.getText().toString());
+                        InputIntentService.startActionSaveOutput(mContext, tv_batch_number.getText().toString());
                     }
                 })
                 .setMessage("确认提交吗？").create();
@@ -237,7 +233,7 @@ public class OutputFragment extends KeyDwonFragment{
         @Override
         public void run() {
             super.run();
-                mContext.mReader.scan();
+            mContext.mReader.scan();
         }
 
     }
@@ -246,7 +242,7 @@ public class OutputFragment extends KeyDwonFragment{
     public void onPause() {
         super.onPause();
 
-        isCurrFrag=false;
+        isCurrFrag = false;
 
         threadStop = true;
 
@@ -261,12 +257,11 @@ public class OutputFragment extends KeyDwonFragment{
     }
 
 
-
     @Override
     public void onResume() {
         super.onResume();
 
-        isCurrFrag=true;
+        isCurrFrag = true;
         //动态注册广播接收器
         IntentFilter statusIntentFilter = new IntentFilter(Constants.ACTION_SAVEOUTPUT);
         mSubmitStateReceiver = new SubmitStateReceiver();
@@ -280,32 +275,31 @@ public class OutputFragment extends KeyDwonFragment{
 
     @Override
     public void myOnKeyDwon(Boolean isScanKey) {
-        isLocationNumber=isScanKey;
+        isLocationNumber = isScanKey;
         doDecode();
     }
 
     // Broadcast receiver for receiving status updates from the IntentService
-    private class SubmitStateReceiver extends BroadcastReceiver
-    {
+    private class SubmitStateReceiver extends BroadcastReceiver {
         // Prevents instantiation
         private SubmitStateReceiver() {
         }
+
         // Called when the BroadcastReceiver gets an Intent it's registered to receive
         @Override
         public void onReceive(Context context, Intent intent) {
-            String i="";
-           if(Constants.RES_SUCCEES.equals(intent.getStringExtra(Constants.EXTENDED_DATA_STATUS))){
-               Toast.makeText(getActivity(),
-                       R.string.msg_submit_success,
-                       Toast.LENGTH_SHORT).show();
-               clear();
-           }
+            String i = "";
+            if (Constants.RES_SUCCEES.equals(intent.getStringExtra(Constants.EXTENDED_DATA_STATUS))) {
+                Toast.makeText(getActivity(),
+                        R.string.msg_submit_success,
+                        Toast.LENGTH_SHORT).show();
+                clear();
+            }
         }
     }
 
     /**
      * 自定义适配器，常见将Cursor或者其他的数据存储在一个集合中，效率提高！
-     *
      */
     private class MyAdapter extends BaseAdapter {
         @Override
@@ -343,20 +337,20 @@ public class OutputFragment extends KeyDwonFragment{
                 view = convertView; //如果已经加载将重复使用
             }
             //不用重复的查找控件
-                ViewSet views = (ViewSet) view.getTag();
-                views.textView.setText(list.get(position).getLocationno());
-                views.checkBox.setChecked(list.get(position).getIsscan());
+            ViewSet views = (ViewSet) view.getTag();
+            views.textView.setText(list.get(position).getLocationno());
+            views.checkBox.setChecked(list.get(position).getIsscan());
             return view;
         }
 
 
     }
+
     //保存item控件
-    static class ViewSet{
+    static class ViewSet {
         TextView textView;
         CheckBox checkBox;
     }
-
 
 
 }
