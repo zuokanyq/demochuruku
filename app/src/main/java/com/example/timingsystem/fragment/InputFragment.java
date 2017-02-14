@@ -301,7 +301,13 @@ public class InputFragment extends KeyDwonFragment {
                         R.string.msg_submit_success,
                         Toast.LENGTH_SHORT).show();
                 clear();
+            }else if (Constants.RES_REPEAT.equals(intent.getStringExtra(Constants.EXTENDED_DATA_STATUS))){
+                Toast.makeText(getActivity(),
+                        R.string.msg_submit_repeat,
+                        Toast.LENGTH_SHORT).show();
+                clear();
             }
+
         /*
          * Handle Intents here.
          */

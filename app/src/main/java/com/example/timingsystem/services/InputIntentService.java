@@ -4,13 +4,18 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Xml;
 
 import com.example.timingsystem.Constants;
+import com.example.timingsystem.MyApplication;
+import com.example.timingsystem.R;
 import com.example.timingsystem.helper.DatabaseServer;
+import com.example.timingsystem.model.Batch;
 import com.example.timingsystem.model.InputBatch;
 import com.example.timingsystem.model.Location;
+import com.example.timingsystem.model.MessageRetrun;
 import com.example.timingsystem.model.OutputBatch;
 
 import org.ksoap2.serialization.SoapObject;
@@ -42,7 +47,7 @@ public class InputIntentService extends IntentService {
     private static final String EXTRA_LOCATIONNOS = "com.example.timingsystem.services.extra.LOCATIONNOS";
 
     private DatabaseServer databaseServer;
-    private SharedPreferences pref;
+    private MyApplication app;
 
     public InputIntentService() {
         super("InputIntentService");
@@ -162,6 +167,7 @@ public class InputIntentService extends IntentService {
     /**
      * Handle action PushInput in the provided background thread with the provided
      * parameters.
+     * 推送数据库中的所有入库数据
      */
     private void handleActionPushInput() {
         // TODO: Handle action PushInput
@@ -169,27 +175,13 @@ public class InputIntentService extends IntentService {
         if (inputBatchList.isEmpty()){
             return;
         }
-        String inputxml = generateXml(inputBatchList);
-        String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
-        String webMethName = "Input";
-        Map<String, String> paramsmap=new HashMap<String, String>();
-        paramsmap.put("InputSend",inputxml);
-       /* SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
-
-        if("Success".equals(obj.getProperty("resMsg"))){
-            InputBatch inputBatch= parseSoapObject(obj);
-            databaseServer.deleteInputBatch(inputBatchList);
-        }else if ("Error".equals((obj.getProperty("resMsg")))){
-            //Webservice 调用过程中出错
-        }
-        else{
-
-        }*/
+       pushinputXml(inputBatchList);
 
     }
     /**
      * Handle action PushInput in the provided background thread with the provided
      * parameters.
+     * 推送指定id的入库数据
      */
     private void handleActionPushInputOne(Integer id) {
         // TODO: Handle action PushInput
@@ -197,29 +189,40 @@ public class InputIntentService extends IntentService {
         InputBatch inputBatch = databaseServer.getInputBatch(id);
         if (inputBatch!=null){
             inputBatchList.add(inputBatch);
-            String inputxml = generateXml(inputBatchList);
-            String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
-            String webMethName = "Input";
-            Map<String, String> paramsmap=new HashMap<String, String>();
-            paramsmap.put("InputSend",inputxml);
-           /* SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
-
-            if("Success".equals(obj.getProperty("resMsg"))){
-                InputBatch inputBatch= parseSoapObject(obj);
-                databaseServer.deleteInputBatch(inputBatchList);
-            }else if ("Error".equals((obj.getProperty("resMsg")))){
-                //Webservice 调用过程中出错
-            }
-            else{
-
-            }*/
+            pushinputXml(inputBatchList);
         }
 
     }
 
     /**
+     * 入库数据推送方法
+     * @param inputBatchList
+     */
+    private void pushinputXml(List<InputBatch> inputBatchList) {
+        String inputxml = generateXml(inputBatchList);
+        String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
+        String webMethName = "Input";
+        Map<String, String> paramsmap=new HashMap<String, String>();
+        paramsmap.put("InputSend",inputxml);
+            SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
+
+            if("Success".equals(obj.getProperty("resMsg"))){
+                MessageRetrun message= parseSoapObjectToMessage(obj,true);
+                databaseServer.deleteInputBatchByNo(message.getSuccessList());
+            }else if ("Error".equals((obj.getProperty("resMsg")))){
+                //Webservice 调用过程中出错
+            }
+            else{
+
+
+
+            }
+    }
+
+    /**
      * Handle action PushInput in the provided background thread with the provided
      * parameters.
+     * 推送所有出库数据
      */
     private void handleActionPushOutputOne(Integer id) {
         // TODO: Handle action PushInput
@@ -236,6 +239,7 @@ public class InputIntentService extends IntentService {
     /**
      * Handle action PushInput in the provided background thread with the provided
      * parameters.
+     * 推送指定id的出库数据
      */
     private void handleActionPushOutput() {
         // TODO: Handle action PushOutput
@@ -247,23 +251,29 @@ public class InputIntentService extends IntentService {
 
     }
 
+    /**
+     * 出库数据推送方法
+     * @param outputBatchList
+     */
     private void pushoutputXml(List<OutputBatch> outputBatchList){
-        String inputxml = generateOutputXml(outputBatchList);
+        String outputxml = generateOutputXml(outputBatchList);
         String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
-        String webMethName = "Input";
+        String webMethName = "Output";
         Map<String, String> paramsmap=new HashMap<String, String>();
-        paramsmap.put("InputSend",inputxml);
-           /* SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
+        paramsmap.put("OutputSend",outputxml);
+            SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
 
-            if("Success".equals(obj.getProperty("resMsg"))){
-                InputBatch inputBatch= parseSoapObject(obj);
-                databaseServer.deleteInputBatch(inputBatchList);
-            }else if ("Error".equals((obj.getProperty("resMsg")))){
-                //Webservice 调用过程中出错
-            }
-            else{
+        if("Success".equals(obj.getProperty("resMsg"))){
+            MessageRetrun message= parseSoapObjectToMessage(obj,false);
+            databaseServer.deleteOutputBatchByNo(message.getSuccessList());
+        }else if ("Error".equals((obj.getProperty("resMsg")))){
+            //Webservice 调用过程中出错
+        }
+        else{
 
-            }*/
+
+
+        }
     }
 
 
@@ -281,8 +291,19 @@ public class InputIntentService extends IntentService {
      */
     private void handleActionSaveInput(String batchno,String locationNo) {
         // TODO: Handle action SaveInput
+        InputBatch queryBatch = databaseServer.getInputBatch(batchno);
+        if (queryBatch!=null){
+            Intent localIntent =
+                    new Intent(Constants.ACTION_SAVEINPUT)
+                            .putExtra(Constants.EXTENDED_DATA_STATUS, Constants.RES_REPEAT);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
+            return;
+        }
+
         InputBatch inputBatch = new InputBatch();
         inputBatch.setBatchno(batchno);
+        app=(MyApplication)getApplication();
+        inputBatch.setUserID(app.getUserID());
         inputBatch.setLocationList(new ArrayList<Location>());
         String[] locationNos = locationNo.split("\n");
         for(String locNo:locationNos){
@@ -292,7 +313,6 @@ public class InputIntentService extends IntentService {
                 inputBatch.getLocationList().add(location);
             }
         }
-
         long id= databaseServer.createInputBatch(inputBatch);
 
 
@@ -318,8 +338,18 @@ public class InputIntentService extends IntentService {
      */
     private void handleActionSaveOutput(String batchno) {
         // TODO: Handle action SaveOutnput
+        OutputBatch queryBatch = databaseServer.getOutputBatch(batchno);
+        if (queryBatch!=null){
+            Intent localIntent =
+                    new Intent(Constants.ACTION_SAVEOUTPUT)
+                            .putExtra(Constants.EXTENDED_DATA_STATUS, Constants.RES_REPEAT);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
+            return;
+        }
         OutputBatch outputBatch = new OutputBatch();
         outputBatch.setBatchno(batchno);
+        app=(MyApplication)getApplication();
+        outputBatch.setUserID(app.getUserID());
         long id= databaseServer.createOutputBatch(outputBatch);
         if (id>0){
             Intent localIntent =
@@ -331,7 +361,11 @@ public class InputIntentService extends IntentService {
     }
 
 
-
+    /**
+     * 将xml文件解析成InputBatch对象
+     * @param xmlStr
+     * @return
+     */
     private InputBatch getInputBatch(String xmlStr){
         InputBatch inputbatch=null;
         List<Location> locationlist=null;
@@ -379,6 +413,11 @@ public class InputIntentService extends IntentService {
         return inputbatch;
     }
 
+    /**
+     * 将list<InputBatch>转换成接口约定的xml格式字符串
+     * @param inputBatchList
+     * @return
+     */
     private String generateXml(List<InputBatch> inputBatchList) {
         String xml="";
         XmlSerializer serializer = Xml.newSerializer();
@@ -396,7 +435,7 @@ public class InputIntentService extends IntentService {
                 serializer.endTag(null, "LotNO");
 
                 serializer.startTag(null, "UserID");
-                serializer.text("aaa");
+                serializer.text(inputbatch.getUserID());
                 serializer.endTag(null, "UserID");
 
                 serializer.startTag(null, "InputDate");
@@ -426,6 +465,11 @@ public class InputIntentService extends IntentService {
         return xml;
     }
 
+    /**
+     * 将list<OutputBatch>转换成接口约定的xml格式字符串
+     * @param outputBatchList
+     * @return
+     */
     private String generateOutputXml(List<OutputBatch> outputBatchList) {
         String xml="";
         XmlSerializer serializer = Xml.newSerializer();
@@ -443,22 +487,13 @@ public class InputIntentService extends IntentService {
                 serializer.endTag(null, "LotNO");
 
                 serializer.startTag(null, "UserID");
-                serializer.text("aaa");
+                serializer.text(outputbatch.getUserID());
                 serializer.endTag(null, "UserID");
 
-                serializer.startTag(null, "InputDate");
+                serializer.startTag(null, "OutputDate");
                 serializer.text(outputbatch.getOutputtime().toString());
-                serializer.endTag(null, "InputDate");
+                serializer.endTag(null, "OutputDate");
 
-                serializer.startTag(null, "StockNO");  //库位信息
-                if(!outputbatch.getLocationList().isEmpty()){
-                    for(Location location: outputbatch.getLocationList()){
-                        serializer.startTag(null, "NO");
-                        serializer.text(location.getLocationno());
-                        serializer.endTag(null, "NO");
-                    }
-                }
-                serializer.endTag(null, "StockNO");
                 serializer.endTag(null, "StockInfo");
             }
             serializer.endTag(null, "OutputSend");
@@ -473,11 +508,15 @@ public class InputIntentService extends IntentService {
         return xml;
     }
 
-
-    private InputBatch parseSoapObject(SoapObject obj){
-        InputBatch inputBatch=new InputBatch();
+    /**
+     * 将ksoap2框架调用webservice传回的SoapObject转换成Batch对象
+     * @param obj
+     * @return
+     */
+    private Batch parseSoapObjectToBatch(SoapObject obj){
+        Batch batch=new InputBatch();
         SoapObject returnobj = (SoapObject)obj.getProperty("OutputQueryReturn");
-        inputBatch.setBatchno(returnobj.getProperty("LotNO").toString());
+        batch.setBatchno(returnobj.getProperty("LotNO").toString());
         SoapObject locationsobj = (SoapObject)returnobj.getProperty("StockNO");
         List<Location> locationList = new ArrayList<Location>();
         for(int i=0; i<locationsobj.getPropertyCount();i++){
@@ -485,8 +524,38 @@ public class InputIntentService extends IntentService {
             location.setLocationno(locationsobj.getProperty(i).toString());
             locationList.add(location);
         }
-        inputBatch.setLocationList(locationList);
-        return inputBatch;
+        batch.setLocationList(locationList);
+        return batch;
+    }
+
+    /**
+     * 将ksoap2框架调用webservice传回的SoapObject转换成Batch对象
+     * @param obj
+     * @return
+     */
+    private MessageRetrun parseSoapObjectToMessage(SoapObject obj,Boolean isinput ){
+        MessageRetrun message=new MessageRetrun();
+        SoapObject returnobj=null;
+        if (isinput){
+            returnobj = (SoapObject)obj.getProperty("InputReturn");
+
+        }else{
+            returnobj = (SoapObject)obj.getProperty("OutputReturn");
+        }
+        message.setMessage(returnobj.getProperty("Message").toString());
+        SoapObject sucessobj = (SoapObject)returnobj.getProperty("Success");
+        List<String> sucessList = new ArrayList<String>();
+        for(int i=0; i<sucessobj.getPropertyCount();i++){
+            sucessList.add(sucessobj.getProperty(i).toString());
+        }
+        message.setSuccessList(sucessList);
+        SoapObject failedobj = (SoapObject)returnobj.getProperty("Failed");
+        List<String> failedList = new ArrayList<String>();
+        for(int i=0; i<failedobj.getPropertyCount();i++){
+            failedList.add(failedobj.getProperty(i).toString());
+        }
+        message.setFailedList(failedList);
+        return message;
     }
 
 }

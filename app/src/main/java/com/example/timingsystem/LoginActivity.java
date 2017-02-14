@@ -5,35 +5,21 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.timingsystem.model.MdSHMobileUserInfo;
 import com.example.timingsystem.services.CallWebService;
 
-
-import java.io.IOException;
-import java.util.ArrayList;
+import org.ksoap2.serialization.SoapObject;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-/*import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;*/
 
 /**
  * 系统登录demo
@@ -44,11 +30,9 @@ import okhttp3.Response;*/
 public class LoginActivity extends BaseActivity {
 	
 	private SharedPreferences pref;
-	
 	private SharedPreferences.Editor editor;
 
 	private EditText accountEdit;
-
 	private EditText passwordEdit;
 
 	private Button login;
@@ -57,10 +41,11 @@ public class LoginActivity extends BaseActivity {
     private CheckBox rememberPass;
     private String userID;
     private String passWord;
+    private MyApplication app;
 
 	public static final String LOGIN_SUECCESS = "success";
     public static final String LOGIN_ERROR = "error";
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -97,36 +82,44 @@ public class LoginActivity extends BaseActivity {
 		});
 	}
 
-    private class AsyncCallWS extends AsyncTask<String, Void, Void> {
+    private class AsyncCallWS extends AsyncTask<String, String,String> {
 
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected String doInBackground(String... params) {
             //Invoke webservice
             String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
             String webMethName = "HasMobilePermission";
             Map<String, String> paramsmap=new HashMap<String, String>();
             paramsmap.put("LoginSend",generateLoginXml());
-            CallWebService.invokeLoginWS(url,webMethName,paramsmap);
+            SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
+            String result="";
+            if("Success".equals(obj.getProperty("resMsg"))){
+                result= parseSoapObjectToString(obj);
 
-            return null;
+            }else if ("Error".equals((obj.getProperty("resMsg")))){
+                result=LOGIN_ERROR;
+                //Webservice 调用过程中出错
+            }
+            return result;
         }
 
         private String generateLoginXml() {
-            String xml="<UserID>"+userID+"</UserID>" +
-                    "<PassWord>"+passWord+"</PassWord>";
+
+            String xml="<LoginSend><UserID>"+userID+"</UserID>" +
+                    "<PassWord>"+passWord+"</PassWord></LoginSend>";
             return xml;
         }
 
 
         @Override
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(String result) {
 
             //Make ProgressBar invisible
-            String res=result.toString();
+
             dialog.dismiss();//关闭ProgressDialog
-            String resultstr=result.toString();
-            if(resultstr.equals(LOGIN_SUECCESS)) {
+
+            if(result.equals(LOGIN_SUECCESS)) {
 
                 String account = accountEdit.getText().toString();
                 String password = passwordEdit.getText().toString();
@@ -139,17 +132,19 @@ public class LoginActivity extends BaseActivity {
                     editor.clear();
                 }
                 editor.commit();
+                app = (MyApplication) getApplication();
+                app.setUserID(account);
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
-            }else if (resultstr.equals(LOGIN_ERROR)){
+            }else if (result.equals(LOGIN_ERROR)){
 
                     Toast.makeText(LoginActivity.this,
                             "网络故障",
                             Toast.LENGTH_SHORT).show();
             }else {
                 Toast.makeText(LoginActivity.this,
-                        resultstr,
+                        result,
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -160,6 +155,18 @@ public class LoginActivity extends BaseActivity {
             dialog = ProgressDialog.show(LoginActivity.this, "登录提示", "正在登录，请稍等...", false);//创建ProgressDialog
         }
 
+    }
+
+    /**
+     * 将ksoap2框架调用webservice传回的SoapObject转换成Batch对象
+     * @param obj
+     * @return
+     */
+    private String parseSoapObjectToString(SoapObject obj){
+        String res="";
+        SoapObject returnobj = (SoapObject)obj.getProperty("LoginReturn");
+        res=returnobj.getProperty("Message").toString();
+        return res;
     }
 
 }

@@ -4,24 +4,34 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.timingsystem.R;
 
 import com.example.timingsystem.MainActivity;
-import com.example.timingsystem.R;
+
 import com.example.timingsystem.helper.DatabaseServer;
 import com.example.timingsystem.model.Batch;
 import com.example.timingsystem.model.InputBatch;
+import com.example.timingsystem.model.Location;
+import com.example.timingsystem.model.OutputBatch;
 import com.example.timingsystem.services.InputIntentService;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
@@ -46,6 +56,14 @@ public class ReviewFragment extends KeyDwonFragment {
 
     private ProgressDialog dialog = null;
     private DatabaseServer dbserver;
+    private View reviewView;
+    private View popview;
+    private PopupWindow popupWindow;
+    private Button btn_delete;
+    private Button btn_push;
+    private Button btn_cancel;
+
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -60,7 +78,7 @@ public class ReviewFragment extends KeyDwonFragment {
         View v = inflater.inflate(R.layout.fragment_review,
                 container, false);
         ViewUtils.inject(this, v);
-
+        reviewView=v;
         inputlist = new ArrayList<Batch>();
         outputlist = new ArrayList<Batch>();
         inputadapter = new BatchAdapter(inputlist);
@@ -74,7 +92,9 @@ public class ReviewFragment extends KeyDwonFragment {
 
                 Object o = listviewinput.getItemAtPosition(position);
                 final InputBatch inputbatch=(InputBatch)o;
-                AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
+                InputBatch detailInputBatch = dbserver.getInputBatch(inputbatch.getId());
+                showWindow(view,true,detailInputBatch);
+                /*AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
                         .setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
                             @Override
@@ -83,7 +103,7 @@ public class ReviewFragment extends KeyDwonFragment {
                             }
                         })
                         .setMessage("您确定要上传该条数据吗？").create();
-                dialog.show();
+                dialog.show();*/
             }
         });
 
@@ -191,7 +211,7 @@ public class ReviewFragment extends KeyDwonFragment {
 
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected Void  doInBackground(String... params) {
 
             inputlist=new ArrayList<Batch>(dbserver.getInputBatchList());
             outputlist=new ArrayList<Batch>(dbserver.getOutputBatchList());
@@ -215,6 +235,115 @@ public class ReviewFragment extends KeyDwonFragment {
             dialog = ProgressDialog.show(mContext, "加载", "正在加载数据，请稍等...", false);//创建ProgressDialog
         }
 
+    }
+
+    private void showWindow(View parent, Boolean isinput, final InputBatch detailInputBatch) {
+
+            LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            if(isinput){
+                popview = layoutInflater.inflate(R.layout.popwin_input, null);
+            }else{
+                popview = layoutInflater.inflate(R.layout.popwin_output, null);
+            }
+
+            //为各文本框赋值
+            TextView tv_batchNo = (TextView) popview.findViewById(R.id.tv_batch_number);
+            TextView tv_locationNo = (TextView) popview.findViewById(R.id.tv_locationNo);
+            TextView tv_userid = (TextView) popview.findViewById(R.id.tv_userid);
+            TextView tv_inputtime = (TextView) popview.findViewById(R.id.tv_inputtime);
+            TextView tv_isfailed = (TextView) popview.findViewById(R.id.tv_isfailed);
+            TextView tv_reasonView = (TextView) popview.findViewById(R.id.tv_failedreason);
+            btn_delete = (Button)popview.findViewById(R.id.btn_delete);;
+            btn_push = (Button)popview.findViewById(R.id.btn_push);;
+            btn_cancel = (Button)popview.findViewById(R.id.btn_cancel);;
+
+            tv_batchNo.setText(detailInputBatch.getBatchno());
+            String locationNOs="";
+            if (detailInputBatch.getLocationList()!=null){
+                for (Location location: detailInputBatch.getLocationList()){
+                    locationNOs+= location.getLocationno()+"\n";
+                }
+            }
+            tv_locationNo.setText(locationNOs);
+            tv_userid.setText(detailInputBatch.getUserID());
+            tv_inputtime.setText(detailInputBatch.getInputtime().toString());
+            String isfailed = "";
+            if (detailInputBatch.getIsfailed()==1){ isfailed="上传失败"; }
+            tv_isfailed.setText(isfailed);
+            tv_reasonView.setText(detailInputBatch.getFailedreason());
+
+            // 创建一个PopuWidow对象
+            popupWindow = new PopupWindow(popview, WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.MATCH_PARENT-2);
+
+        // 使其聚集
+        popupWindow.setFocusable(true);
+        // 设置允许在外点击消失
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setClippingEnabled(false);
+        // 这个是为了点击“返回Back”也能使其消失，并且并不会影响你的背景
+        ColorDrawable dw = new ColorDrawable(Color.WHITE);
+        dw.setAlpha(255);
+
+        popupWindow.setBackgroundDrawable(dw);
+
+        popupWindow.showAtLocation(reviewView, Gravity.BOTTOM | Gravity.LEFT,0,0);
+
+       // mContext.getWindow().setBackgroundDrawable(dw);
+
+
+        btn_delete.setOnClickListener (new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
+                        .setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                               int resint= dbserver.deleteInputBatch(detailInputBatch);
+                                String resStr="删除失败";
+                               if(resint>0){resStr="删除成功";}
+                                Toast.makeText(mContext,resStr, Toast.LENGTH_SHORT).show();
+                                if (popupWindow != null) {
+                                    popupWindow.dismiss();
+                                }
+                                AsyncCallData task = new AsyncCallData();
+                                task.execute();
+                            }
+                        })
+                        .setMessage("您确定要删除该条数据吗？").create();
+                dialog.show();
+
+            }
+        });
+
+        btn_push.setOnClickListener (new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
+                        .setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                InputIntentService.startActionPushInputOne(mContext,detailInputBatch.getId());
+                            }
+                        })
+                        .setMessage("您确定要推送该条数据吗？").create();
+                dialog.show();
+                if (popupWindow != null) {
+                    popupWindow.dismiss();
+                }
+            }
+        });
+
+        btn_cancel.setOnClickListener (new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               if (popupWindow != null) {
+                    popupWindow.dismiss();
+                }
+            }
+        });
     }
 
 }

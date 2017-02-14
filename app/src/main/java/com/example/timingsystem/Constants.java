@@ -16,4 +16,5 @@ public final class Constants {
     public static final String EXTENDED_DATA_STATUS="com.example.timingsystem.services.extra.submitstatus";
 
     public static final String RES_SUCCEES ="Success";
+    public static final String RES_REPEAT="Repeat";
 }

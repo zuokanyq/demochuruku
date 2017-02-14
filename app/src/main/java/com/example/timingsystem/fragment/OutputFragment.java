@@ -1,11 +1,13 @@
 package com.example.timingsystem.fragment;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -24,16 +26,20 @@ import com.example.timingsystem.Constants;
 import com.example.timingsystem.MainActivity;
 import com.example.timingsystem.R;
 import com.example.timingsystem.model.Location;
-import com.example.timingsystem.model.OutputBatch;
+import com.example.timingsystem.services.CallWebService;
 import com.example.timingsystem.services.InputIntentService;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
 import com.zebra.adc.decoder.Barcode2DWithSoft;
 
+import org.ksoap2.serialization.SoapObject;
+
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class OutputFragment extends KeyDwonFragment {
@@ -53,9 +59,6 @@ public class OutputFragment extends KeyDwonFragment {
     @ViewInject(R.id.svResult)
     private ScrollView svResult;
     private String init_barcode;
-/*    int sussCount = 0;
-    int failCount = 0;
-    int errorCount = 0;*/
 
     private boolean threadStop = true;
 
@@ -67,6 +70,11 @@ public class OutputFragment extends KeyDwonFragment {
     private SubmitStateReceiver mSubmitStateReceiver;
     private MyAdapter adapter;
     private List<Location> list;
+
+    public static final String LOGIN_SUECCESS = "success";
+    public static final String LOGIN_ERROR = "error";
+
+    private ProgressDialog pgDialog = null;
 
     public Barcode2DWithSoft.ScanCallback mScanCallback = new Barcode2DWithSoft.ScanCallback() {
         @Override
@@ -95,20 +103,12 @@ public class OutputFragment extends KeyDwonFragment {
                 }
                 adapter.notifyDataSetChanged();
             } else {    //扫描结果是批次号
+                barCode="PP305192AC6035A68";
+
                 tv_batch_number.setText(barCode);
                 list.clear();
-                Location loc1 = new Location();
-                loc1.setLocationno("SZ");
-                loc1.setIsscan(false);
-                list.add(loc1);
-               /* for(int li=0;li<3;li++){
-                    Location loc=new Location();
-                    loc.setLocationno("locno"+String.valueOf(li));
-                    loc.setIsscan(false);
-                    list.add(loc);
-                }*/
-                adapter.notifyDataSetChanged();
-
+                AsyncCallWSQuery task = new AsyncCallWSQuery();
+                task.execute(barCode);
             }
         }
     };
@@ -214,8 +214,6 @@ public class OutputFragment extends KeyDwonFragment {
                 })
                 .setMessage("确认提交吗？").create();
         dialog.show();
-
-
     }
 
     private void clear() {
@@ -268,8 +266,6 @@ public class OutputFragment extends KeyDwonFragment {
         LocalBroadcastManager.getInstance(mContext).registerReceiver(
                 mSubmitStateReceiver,
                 statusIntentFilter);
-
-
     }
 
 
@@ -292,6 +288,11 @@ public class OutputFragment extends KeyDwonFragment {
             if (Constants.RES_SUCCEES.equals(intent.getStringExtra(Constants.EXTENDED_DATA_STATUS))) {
                 Toast.makeText(getActivity(),
                         R.string.msg_submit_success,
+                        Toast.LENGTH_SHORT).show();
+                clear();
+            } else if (Constants.RES_REPEAT.equals(intent.getStringExtra(Constants.EXTENDED_DATA_STATUS))){
+                Toast.makeText(getActivity(),
+                        R.string.msg_submit_repeat,
                         Toast.LENGTH_SHORT).show();
                 clear();
             }
@@ -350,6 +351,76 @@ public class OutputFragment extends KeyDwonFragment {
     static class ViewSet {
         TextView textView;
         CheckBox checkBox;
+    }
+
+
+    private class AsyncCallWSQuery extends AsyncTask<String, String,String> {
+
+
+        @Override
+        protected String doInBackground(String... params) {
+            //Invoke webservice
+            String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
+            String webMethName = "OutputQuery";
+            Map<String, String> paramsmap=new HashMap<String, String>();
+            paramsmap.put("OutputQuerySend",generateXml(params[0]));
+            SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
+            String result="";
+            if("Success".equals(obj.getProperty("resMsg"))){
+                parseSoapObject(obj);
+                result= LOGIN_SUECCESS;
+
+            }else if ("Error".equals((obj.getProperty("resMsg")))){
+                result=LOGIN_ERROR;
+                //Webservice 调用过程中出错
+            }
+            return result;
+        }
+
+        private String generateXml(String batchNO) {
+            String xml = "<OutputQuerySend><LotNO>" + batchNO + "</LotNO></OutputQuerySend>";
+            return xml;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            //Make ProgressBar invisible
+
+         //   pgDialog.dismiss();//关闭ProgressDialog
+
+            if(result.equals(LOGIN_SUECCESS)) {
+                adapter.notifyDataSetChanged();
+            }else if (result.equals(LOGIN_ERROR)){
+                Toast.makeText(mContext,
+                        "网络故障",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        //    pgDialog = ProgressDialog.show(mContext, "提示", "正在查询，请稍等...", false);//创建ProgressDialog
+        }
+
+    }
+
+    /**
+     * 将ksoap2框架调用webservice传回的SoapObject转换成Batch对象
+     * @param obj
+     * @return
+     */
+    private void parseSoapObject(SoapObject obj){
+        SoapObject returnobj = (SoapObject)obj.getProperty("OutputQueryReturn");
+        SoapObject locationobj = (SoapObject)returnobj.getProperty("StockNO");
+        list.clear();
+        for(int i=0; i<locationobj.getPropertyCount();i++){
+            Location loc = new Location();
+            loc.setLocationno(locationobj.getProperty(i).toString());
+            loc.setIsscan(false);
+            list.add(loc);
+        }
     }
 
 

@@ -952,12 +952,21 @@
     <!--review-->
     <string name="review_input_batchNO">入库批次号</string>
     <string name="review_output_batchNO">出库批次号</string>
+    <string name="review_inputtime">入库时间</string>
+    <string name="review_outputtime">出库时间</string>
+    <string name="review_userid">用户ID</string>
+    <string name="review_isfailed">上传结果</string>
+    <string name="review_failedreason">失败原因</string>
+    <string name="review_btn_delete">删除</string>
+    <string name="review_btn_push">上传</string>
+    <string name="review_btn_cancel">取消</string>
 
     <string name="msg_batchNo_empty">请扫描批次号</string>
     <string name="msg_LocationNO_empty">请扫描库位号</string>
     <string name="msg_LocationNO_notscan">请扫描所有库位号!</string>
     <string name="msg_submit_success">提交成功</string>
     <string name="msg_submit_fault">提交失败</string>
+    <string name="msg_submit_repeat">该批次已存在</string>
 
     <!--login-->
     <string name="Account">用户名:</string>

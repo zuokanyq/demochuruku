@@ -14,7 +14,7 @@ public class DatabaseHelper  extends SQLiteOpenHelper {
     private static final String LOG = "DatabaseHelper";
 
     // Database Version
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     // Database Name
     private static final String DATABASE_NAME = "TimingManager";
@@ -34,6 +34,7 @@ public class DatabaseHelper  extends SQLiteOpenHelper {
     protected static final String KEY_ISFAILED = "isfailed";
     protected static final String KEY_FAILEDREASON = "failedreason";
     protected static final String KEY_OUTPUTTIME = "outputtime";
+    protected static final String KEY_USERID = "userid";
 
     // LOCATION Table - column names
     protected static final String KEY_BATCHID = "batchid";
@@ -43,7 +44,8 @@ public class DatabaseHelper  extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_INPUT_BATCH = "CREATE TABLE "
             + TABLE_INPUT_BATCH + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_BATCHNO
             + " TEXT," + KEY_INPUTTIME + " DATETIME DEFAULT  (datetime('now','localtime')), "
-            + KEY_ISFAILED + " INTEGER DEFAULT 0 ," + KEY_FAILEDREASON + " TEXT"
+            + KEY_ISFAILED + " INTEGER DEFAULT 0 ," + KEY_FAILEDREASON + " TEXT,"
+            + KEY_USERID + " TEXT"
             + " )";
 
     // INPUTLOCATION table create statement
@@ -55,7 +57,8 @@ public class DatabaseHelper  extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_OUTPUT_BATCH = "CREATE TABLE "
             + TABLE_OUTPUT_BATCH + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_BATCHNO
             + " TEXT," + KEY_OUTPUTTIME + " DATETIME DEFAULT  (datetime('now','localtime')), "
-            + KEY_ISFAILED + " INTEGER DEFAULT 0 ," + KEY_FAILEDREASON + " TEXT"
+            + KEY_ISFAILED + " INTEGER DEFAULT 0 ," + KEY_FAILEDREASON + " TEXT,"
+            + KEY_USERID + " TEXT"
             + " )";
 
     // OUTPUTLOCATION table create statement

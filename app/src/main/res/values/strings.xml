@@ -982,6 +982,14 @@
     <!--review-->
     <string name="review_input_batchNO">Input Batch Number</string>
     <string name="review_output_batchNO">Output Batch Number</string>
+    <string name="review_inputtime">Input Time</string>
+    <string name="review_outputtime">Output Time</string>
+    <string name="review_userid">UserID</string>
+    <string name="review_isfailed">Is Failed</string>
+    <string name="review_failedreason">Failed Reason</string>
+    <string name="review_btn_delete">Delete</string>
+    <string name="review_btn_push">Push</string>
+    <string name="review_btn_cancel">Cancel</string>
 
 
     <string name="msg_batchNo_empty">Scan BatchNO please!</string>
@@ -989,6 +997,7 @@
     <string name="msg_LocationNO_notscan">Scan all LocationNo please!</string>
     <string name="msg_submit_success">Submit Success</string>
     <string name="msg_submit_fault">Submit Fault</string>
+    <string name="msg_submit_repeat">this batchNo is already exist</string>
 
 
     <!--login-->

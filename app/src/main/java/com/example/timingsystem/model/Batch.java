@@ -12,6 +12,7 @@ public class Batch {
     String batchno;
     int isfailed;
     String failedreason;
+    String userID;
     List<Location> locationList;
 
     // constructors
@@ -61,5 +62,13 @@ public class Batch {
 
     public void setLocationList(List<Location> locationList) {
         this.locationList = locationList;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 }
