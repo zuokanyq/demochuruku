@@ -1,14 +1,19 @@
 package com.example.timingsystem.services;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Xml;
 
 import com.example.timingsystem.Constants;
+import com.example.timingsystem.MainActivity;
 import com.example.timingsystem.MyApplication;
 import com.example.timingsystem.R;
 import com.example.timingsystem.helper.DatabaseServer;
@@ -49,10 +54,11 @@ public class InputIntentService extends IntentService {
     private DatabaseServer databaseServer;
     private MyApplication app;
 
+
     public InputIntentService() {
         super("InputIntentService");
         databaseServer=new DatabaseServer(this);
-  //      pref = PreferenceManager.getDefaultSharedPreferences(this);
+
     }
 
     /**
@@ -189,7 +195,12 @@ public class InputIntentService extends IntentService {
         InputBatch inputBatch = databaseServer.getInputBatch(id);
         if (inputBatch!=null){
             inputBatchList.add(inputBatch);
-            pushinputXml(inputBatchList);
+            String message = pushinputXml(inputBatchList);
+            Intent localIntent =
+                    new Intent(Constants.ACTION_PUSHINPUT)
+                            .putExtra(Constants.EXTENDED_DATA_STATUS, message);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
+
         }
 
     }
@@ -198,31 +209,36 @@ public class InputIntentService extends IntentService {
      * 入库数据推送方法
      * @param inputBatchList
      */
-    private void pushinputXml(List<InputBatch> inputBatchList) {
+    private String pushinputXml(List<InputBatch> inputBatchList) {
         String inputxml = generateXml(inputBatchList);
-        String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
+       // String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
         String webMethName = "Input";
+        String reStr="";
         Map<String, String> paramsmap=new HashMap<String, String>();
         paramsmap.put("InputSend",inputxml);
-            SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
+        app=(MyApplication)getApplication();
+        SoapObject obj = CallWebService.invokeInputWS(app.getServerurl(),webMethName,paramsmap);
 
-            if("Success".equals(obj.getProperty("resMsg"))){
-                MessageRetrun message= parseSoapObjectToMessage(obj,true);
-                databaseServer.deleteInputBatchByNo(message.getSuccessList());
-            }else if ("Error".equals((obj.getProperty("resMsg")))){
-                //Webservice 调用过程中出错
+        if("Success".equals(obj.getProperty("resMsg"))){
+            MessageRetrun message= parseSoapObjectToMessage(obj,true);
+            databaseServer.deleteInputBatchByNo(message.getSuccessList());
+            databaseServer.updateBatchByNo(message.getFailedList(),true);
+            if("suceess".equals(message.getMessage())) {
+                reStr = "推送成功";
+            }else{
+                reStr = message.getMessage();
             }
-            else{
-
-
-
-            }
+        }else if ("Error".equals((obj.getProperty("resMsg")))){
+            reStr="推送失败,请检查网络状态。";
+        }
+        initNotify("入库数据推送通知",reStr,101);
+        return reStr;
     }
 
     /**
      * Handle action PushInput in the provided background thread with the provided
      * parameters.
-     * 推送所有出库数据
+     * 推送指定id出库数据
      */
     private void handleActionPushOutputOne(Integer id) {
         // TODO: Handle action PushInput
@@ -230,16 +246,18 @@ public class InputIntentService extends IntentService {
         OutputBatch outputBatch = databaseServer.getOutputBatch(id);
         if (outputBatch!=null){
             outputBatchList.add(outputBatch);
-            pushoutputXml(outputBatchList);
-
+            String message = pushoutputXml(outputBatchList);
+            Intent localIntent =
+                    new Intent(Constants.ACTION_PUSHINPUT)
+                            .putExtra(Constants.EXTENDED_DATA_STATUS, message);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
         }
-
     }
 
     /**
      * Handle action PushInput in the provided background thread with the provided
      * parameters.
-     * 推送指定id的出库数据
+     * 推送所有出库数据
      */
     private void handleActionPushOutput() {
         // TODO: Handle action PushOutput
@@ -255,26 +273,30 @@ public class InputIntentService extends IntentService {
      * 出库数据推送方法
      * @param outputBatchList
      */
-    private void pushoutputXml(List<OutputBatch> outputBatchList){
+    private String pushoutputXml(List<OutputBatch> outputBatchList){
         String outputxml = generateOutputXml(outputBatchList);
-        String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
+        //String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
         String webMethName = "Output";
+        String reStr="";
         Map<String, String> paramsmap=new HashMap<String, String>();
         paramsmap.put("OutputSend",outputxml);
-            SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
+        app=(MyApplication)getApplication();
+            SoapObject obj = CallWebService.invokeInputWS(app.getServerurl(),webMethName,paramsmap);
 
         if("Success".equals(obj.getProperty("resMsg"))){
             MessageRetrun message= parseSoapObjectToMessage(obj,false);
             databaseServer.deleteOutputBatchByNo(message.getSuccessList());
+            databaseServer.updateBatchByNo(message.getFailedList(),false);
+            if(!"suceess".equals(message.getMessage())){
+                reStr=message.getMessage();
+                initNotify("出库数据推送通知",reStr,102);
+            }
         }else if ("Error".equals((obj.getProperty("resMsg")))){
-            //Webservice 调用过程中出错
+            reStr="推送失败,请检查网络状态是否正常";
+            initNotify("出库数据推送通知",reStr,102);
         }
-        else{
-
-
-
-        }
-    }
+        return reStr;
+     }
 
 
     /**
@@ -299,6 +321,8 @@ public class InputIntentService extends IntentService {
             LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
             return;
         }
+
+        batchno="PP305192AC6035A68";
 
         InputBatch inputBatch = new InputBatch();
         inputBatch.setBatchno(batchno);
@@ -557,5 +581,25 @@ public class InputIntentService extends IntentService {
         message.setFailedList(failedList);
         return message;
     }
+
+
+
+
+    private void initNotify(String title,String Message,int NOTIFICATIONS_ID){
+        NotificationManager mNotifyMgr =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        PendingIntent contentIntent = PendingIntent.getActivity(
+                this, 0, new Intent(this, MainActivity.class), 0);
+
+        Notification notification = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentTitle(title)
+                .setContentText(Message)
+                .setContentIntent(contentIntent)
+                .getNotification();
+        mNotifyMgr.notify(NOTIFICATIONS_ID, notification);
+    }
+
+
 
 }

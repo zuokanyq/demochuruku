@@ -9,8 +9,11 @@ import android.app.Application;
 public class MyApplication extends Application
     {
         private static final String VALUE = "";
+        private static final String URL = "";
 
         private String userID;
+
+        private String serverurl;
 
         @Override
         public void onCreate()
@@ -25,6 +28,14 @@ public class MyApplication extends Application
 
         public void setUserID(String userID) {
             this.userID = userID;
+        }
+
+        public String getServerurl() {
+            return serverurl;
+        }
+
+        public void setServerurl(String serverurl) {
+            this.serverurl = serverurl;
         }
     }
 

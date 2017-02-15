@@ -257,6 +257,33 @@ public class DatabaseServer {
     }
 
     /*
+* 批量更新入库数据
+*/
+    public void updateBatchByNo(List<String> batchNoList,boolean isinput) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String SqlUPDATE = "UPDATE ";
+        if(isinput) {
+            SqlUPDATE+= dbHelper.TABLE_INPUT_BATCH;
+        }else{
+            SqlUPDATE+= dbHelper.TABLE_OUTPUT_BATCH;
+        }
+        SqlUPDATE+=" SET "+ dbHelper.KEY_ISFAILED +" = 1, "+dbHelper.KEY_FAILEDREASON+" = ?"
+                    +" WHERE "+dbHelper.KEY_BATCHNO+" = ? ;";
+        db.beginTransaction(); //开启事务
+        try {
+            for (String batchNo : batchNoList){
+                String[] batchNoandmessage = batchNo.split("\\^\\^\\^");
+                db.execSQL(SqlUPDATE, new String[] { batchNoandmessage[1].trim(), batchNoandmessage[0].trim()});
+            }
+            db.setTransactionSuccessful(); //事务执行成功
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+
+    }
+    /*
 * Creating a OUTput_batch
 */
     public long createOutputBatch(OutputBatch outputBatch) {
@@ -330,6 +357,27 @@ public class DatabaseServer {
         }
 
     }
+    /*
+* 删除单条出库数据
+*/
+    public int deleteOutputBatch(OutputBatch outputBatch) {
+        int resint=0;
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.beginTransaction(); //开启事务
+        try {
+                db.delete(dbHelper.TABLE_OUTPUT_LOCATION, dbHelper.KEY_BATCHID + " = ?",
+                        new String[] { String.valueOf(outputBatch.getId()) });
+                db.delete(dbHelper.TABLE_OUTPUT_BATCH, dbHelper.KEY_ID + " = ?",
+                        new String[] { String.valueOf(outputBatch.getId()) });
+            db.setTransactionSuccessful(); //事务执行成功
+            resint=1;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+        return resint;
+    }
 
     /*
   * 批量删除出库数据
@@ -354,6 +402,7 @@ public class DatabaseServer {
         }
 
     }
+
 
     private InputBatch setValuetoBatch(Cursor c){
         InputBatch batch=new InputBatch();

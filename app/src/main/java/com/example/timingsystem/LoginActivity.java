@@ -34,6 +34,7 @@ public class LoginActivity extends BaseActivity {
 
 	private EditText accountEdit;
 	private EditText passwordEdit;
+    private EditText urlEdit;
 
 	private Button login;
     private ProgressDialog dialog = null;
@@ -41,6 +42,7 @@ public class LoginActivity extends BaseActivity {
     private CheckBox rememberPass;
     private String userID;
     private String passWord;
+    private String serverUrl;
     private MyApplication app;
 
 	public static final String LOGIN_SUECCESS = "success";
@@ -56,9 +58,12 @@ public class LoginActivity extends BaseActivity {
 		pref = PreferenceManager.getDefaultSharedPreferences(this);
 		accountEdit = (EditText) findViewById(R.id.account);
 		passwordEdit = (EditText) findViewById(R.id.password);
+		urlEdit = (EditText) findViewById(R.id.url);
 		rememberPass = (CheckBox) findViewById(R.id.remember_pass);
 		login = (Button) findViewById(R.id.login);
 		boolean isRemember = pref.getBoolean("remember_password", false);
+        String url= pref.getString("url","192.168.168.196:7676");
+        urlEdit.setText(url);
 		if (isRemember) {
 			String account = pref.getString("account", "");
 			String password = pref.getString("password", "");
@@ -71,9 +76,13 @@ public class LoginActivity extends BaseActivity {
 			public void onClick(View v) {
                 userID = accountEdit.getText().toString();
                 passWord = passwordEdit.getText().toString();
+                serverUrl= urlEdit.getText().toString();
+                editor = pref.edit();
+                editor.putString("url", serverUrl);
+                editor.commit();
                 if (userID.length() != 0 && userID.toString() != "") {
                     AsyncCallWS task = new AsyncCallWS();
-                    task.execute();
+                    task.execute(serverUrl);
                 } else {
                     accountEdit.setText("Please enter name");
                 }
@@ -82,17 +91,17 @@ public class LoginActivity extends BaseActivity {
 		});
 	}
 
-    private class AsyncCallWS extends AsyncTask<String, String,String> {
+    private class AsyncCallWS extends AsyncTask<String, String, String> {
 
 
         @Override
         protected String doInBackground(String... params) {
             //Invoke webservice
-            String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
+           // String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
             String webMethName = "HasMobilePermission";
             Map<String, String> paramsmap=new HashMap<String, String>();
             paramsmap.put("LoginSend",generateLoginXml());
-            SoapObject obj = CallWebService.invokeInputWS(url,webMethName,paramsmap);
+            SoapObject obj = CallWebService.invokeInputWS(params[0],webMethName,paramsmap);
             String result="";
             if("Success".equals(obj.getProperty("resMsg"))){
                 result= parseSoapObjectToString(obj);
@@ -129,11 +138,14 @@ public class LoginActivity extends BaseActivity {
                     editor.putString("account", account);
                     editor.putString("password", password);
                 } else {
-                    editor.clear();
+                    editor.remove("remember_password");
+                    editor.remove("account");
+                    editor.remove("password");
                 }
                 editor.commit();
                 app = (MyApplication) getApplication();
                 app.setUserID(account);
+                app.setServerurl(serverUrl);
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();

@@ -2,8 +2,11 @@ package com.example.timingsystem.fragment;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -11,6 +14,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +27,8 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.timingsystem.Constants;
 import com.example.timingsystem.R;
 
 import com.example.timingsystem.MainActivity;
@@ -63,7 +69,7 @@ public class ReviewFragment extends KeyDwonFragment {
     private Button btn_push;
     private Button btn_cancel;
 
-
+    private PushOneStateReceiver mPushOneStateReceiver;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -93,7 +99,7 @@ public class ReviewFragment extends KeyDwonFragment {
                 Object o = listviewinput.getItemAtPosition(position);
                 final InputBatch inputbatch=(InputBatch)o;
                 InputBatch detailInputBatch = dbserver.getInputBatch(inputbatch.getId());
-                showWindow(view,true,detailInputBatch);
+                showWindow(view,true,detailInputBatch,null);
                 /*AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
                         .setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
@@ -115,6 +121,7 @@ public class ReviewFragment extends KeyDwonFragment {
     @Override
     public void onPause() {
         super.onPause();
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mPushOneStateReceiver);
 
     }
 
@@ -123,6 +130,12 @@ public class ReviewFragment extends KeyDwonFragment {
         super.onResume();
         AsyncCallData task = new AsyncCallData();
         task.execute();
+        IntentFilter statusIntentFilter = new IntentFilter(Constants.ACTION_PUSHINPUT);
+        mPushOneStateReceiver = new PushOneStateReceiver();
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(
+                mPushOneStateReceiver,
+                statusIntentFilter);
+
     }
 
     @Override
@@ -237,59 +250,52 @@ public class ReviewFragment extends KeyDwonFragment {
 
     }
 
-    private void showWindow(View parent, Boolean isinput, final InputBatch detailInputBatch) {
+    private void showWindow(View parent, final Boolean isinput, final InputBatch detailInputBatch, final OutputBatch detailOutputBatch) {
 
             LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             if(isinput){
                 popview = layoutInflater.inflate(R.layout.popwin_input, null);
+                inputTextViewSetValue(popview,detailInputBatch);
             }else{
                 popview = layoutInflater.inflate(R.layout.popwin_output, null);
+                outputTextViewSetValue(popview,detailOutputBatch);
             }
+        btn_delete = (Button)popview.findViewById(R.id.btn_delete);
+        btn_push = (Button)popview.findViewById(R.id.btn_push);;
+        btn_cancel = (Button)popview.findViewById(R.id.btn_cancel);
 
-            //为各文本框赋值
-            TextView tv_batchNo = (TextView) popview.findViewById(R.id.tv_batch_number);
-            TextView tv_locationNo = (TextView) popview.findViewById(R.id.tv_locationNo);
-            TextView tv_userid = (TextView) popview.findViewById(R.id.tv_userid);
-            TextView tv_inputtime = (TextView) popview.findViewById(R.id.tv_inputtime);
-            TextView tv_isfailed = (TextView) popview.findViewById(R.id.tv_isfailed);
-            TextView tv_reasonView = (TextView) popview.findViewById(R.id.tv_failedreason);
-            btn_delete = (Button)popview.findViewById(R.id.btn_delete);;
-            btn_push = (Button)popview.findViewById(R.id.btn_push);;
-            btn_cancel = (Button)popview.findViewById(R.id.btn_cancel);;
-
-            tv_batchNo.setText(detailInputBatch.getBatchno());
-            String locationNOs="";
-            if (detailInputBatch.getLocationList()!=null){
-                for (Location location: detailInputBatch.getLocationList()){
-                    locationNOs+= location.getLocationno()+"\n";
-                }
-            }
-            tv_locationNo.setText(locationNOs);
-            tv_userid.setText(detailInputBatch.getUserID());
-            tv_inputtime.setText(detailInputBatch.getInputtime().toString());
-            String isfailed = "";
-            if (detailInputBatch.getIsfailed()==1){ isfailed="上传失败"; }
-            tv_isfailed.setText(isfailed);
-            tv_reasonView.setText(detailInputBatch.getFailedreason());
+        //为各文本框赋值
 
             // 创建一个PopuWidow对象
-            popupWindow = new PopupWindow(popview, WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.MATCH_PARENT-2);
+            popupWindow = new PopupWindow(popview, WindowManager.LayoutParams.MATCH_PARENT,610);
 
         // 使其聚集
         popupWindow.setFocusable(true);
         // 设置允许在外点击消失
         popupWindow.setOutsideTouchable(true);
-        popupWindow.setClippingEnabled(false);
+   //     popupWindow.setClippingEnabled(false);
         // 这个是为了点击“返回Back”也能使其消失，并且并不会影响你的背景
-        ColorDrawable dw = new ColorDrawable(Color.WHITE);
-        dw.setAlpha(255);
+        ColorDrawable dw255 = new ColorDrawable(Color.WHITE);
+        dw255.setAlpha(255);
 
-        popupWindow.setBackgroundDrawable(dw);
+        popupWindow.setBackgroundDrawable(dw255);
 
         popupWindow.showAtLocation(reviewView, Gravity.BOTTOM | Gravity.LEFT,0,0);
 
-       // mContext.getWindow().setBackgroundDrawable(dw);
+        ColorDrawable dw120 = new ColorDrawable(Color.WHITE);
+        dw120.setAlpha(120);
+        mContext.getWindow().setBackgroundDrawable(dw120);
+
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener(){
+            @Override
+            public void onDismiss() {
+                // TODO Auto-generated method stub
+                ColorDrawable dw255 = new ColorDrawable(Color.WHITE);
+                dw255.setAlpha(255);
+                mContext.getWindow().setBackgroundDrawable(dw255);
+            }
+        });
 
 
         btn_delete.setOnClickListener (new View.OnClickListener() {
@@ -300,7 +306,12 @@ public class ReviewFragment extends KeyDwonFragment {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                               int resint= dbserver.deleteInputBatch(detailInputBatch);
+                                int resint=0;
+                                if(isinput){
+                                    resint= dbserver.deleteInputBatch(detailInputBatch);
+                                }else{
+                                    resint= dbserver.deleteOutputBatch(detailOutputBatch);
+                                }
                                 String resStr="删除失败";
                                if(resint>0){resStr="删除成功";}
                                 Toast.makeText(mContext,resStr, Toast.LENGTH_SHORT).show();
@@ -325,14 +336,18 @@ public class ReviewFragment extends KeyDwonFragment {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                InputIntentService.startActionPushInputOne(mContext,detailInputBatch.getId());
+                                if(isinput){
+                                    InputIntentService.startActionPushInputOne(mContext,detailInputBatch.getId());
+                                }else {
+                                    InputIntentService.startActionPushOutputOne(mContext, detailOutputBatch.getId());
+                                }
+                                if (popupWindow != null) {
+                                    popupWindow.dismiss();
+                                }
                             }
                         })
                         .setMessage("您确定要推送该条数据吗？").create();
                 dialog.show();
-                if (popupWindow != null) {
-                    popupWindow.dismiss();
-                }
             }
         });
 
@@ -346,4 +361,59 @@ public class ReviewFragment extends KeyDwonFragment {
         });
     }
 
+    private void outputTextViewSetValue(View popview, OutputBatch detailOutputBatch) {
+        TextView tv_batchNo = (TextView) popview.findViewById(R.id.tv_batch_number);
+        TextView tv_outputtime = (TextView) popview.findViewById(R.id.tv_outputtime);
+        TextView tv_userid = (TextView) popview.findViewById(R.id.tv_userid);
+        TextView tv_isfailed = (TextView) popview.findViewById(R.id.tv_isfailed);
+        TextView tv_reasonView = (TextView) popview.findViewById(R.id.tv_failedreason);
+
+        tv_batchNo.setText(detailOutputBatch.getBatchno());
+        tv_userid.setText(detailOutputBatch.getUserID());
+        tv_outputtime.setText(detailOutputBatch.getOutputtime().toString());
+        String isfailed = "";
+        if (detailOutputBatch.getIsfailed()==1){ isfailed="上传失败"; }
+        tv_isfailed.setText(isfailed);
+        tv_reasonView.setText(detailOutputBatch.getFailedreason());
+    }
+
+    private void inputTextViewSetValue(View popview, InputBatch detailInputBatch) {
+        TextView tv_batchNo = (TextView) popview.findViewById(R.id.tv_batch_number);
+        TextView tv_locationNo = (TextView) popview.findViewById(R.id.tv_locationNo);
+        TextView tv_inputtime = (TextView) popview.findViewById(R.id.tv_inputtime);
+        TextView tv_userid = (TextView) popview.findViewById(R.id.tv_userid);
+        TextView tv_isfailed = (TextView) popview.findViewById(R.id.tv_isfailed);
+        TextView tv_reasonView = (TextView) popview.findViewById(R.id.tv_failedreason);
+
+        tv_batchNo.setText(detailInputBatch.getBatchno());
+        String locationNOs="";
+        if (detailInputBatch.getLocationList()!=null){
+            for (Location location: detailInputBatch.getLocationList()){
+                locationNOs+= location.getLocationno()+"\n";
+            }
+        }
+        tv_locationNo.setText(locationNOs);
+        tv_userid.setText(detailInputBatch.getUserID());
+        tv_inputtime.setText(detailInputBatch.getInputtime().toString());
+        String isfailed = "";
+        if (detailInputBatch.getIsfailed()==1){ isfailed="上传失败"; }
+        tv_isfailed.setText(isfailed);
+        tv_reasonView.setText(detailInputBatch.getFailedreason());
+    }
+
+
+    // Broadcast receiver for receiving status updates from the IntentService
+    private class PushOneStateReceiver extends BroadcastReceiver {
+        // Prevents instantiation
+        private PushOneStateReceiver() {
+        }
+
+        // Called when the BroadcastReceiver gets an Intent it's registered to receive
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(getActivity(),
+                    intent.getStringExtra(Constants.EXTENDED_DATA_STATUS),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
 }
