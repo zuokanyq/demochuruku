@@ -941,8 +941,8 @@
     <string name="er_dsoft_Set_succ">设置成功</string>
     <string name="er_dsoft_Set_fail">设置失败</string>
     <!--input/output-->
-    <string name="input_batch_number">批次号</string>
-    <string name="input_location_number">库位号</string>
+    <string name="input_batch_number">批次号:</string>
+    <string name="input_location_number">库位号:</string>
     <string name="input_btn_location_scan">扫描库位</string>
     <string name="input_btn_location_clear">清空库位</string>
     <string name="input_btn_location_clearlast">删除库位</string>

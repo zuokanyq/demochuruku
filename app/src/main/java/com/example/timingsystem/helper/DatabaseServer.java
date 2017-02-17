@@ -109,7 +109,7 @@ public class DatabaseServer {
     public OutputBatch getOutputBatch(String batchNO) {
 
         String selectQuery = "SELECT  * FROM " + dbHelper.TABLE_OUTPUT_BATCH + " WHERE "
-                + dbHelper.KEY_BATCHNO + " = " + batchNO;
+                + dbHelper.KEY_BATCHNO + " = '" + batchNO + "'";
         return queryOutputBatch(selectQuery);
     }
 
@@ -129,10 +129,10 @@ public class DatabaseServer {
         Log.e(LOG, selectQuery);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
-        if (c != null) {
+        if (c != null && c.getCount()!=0) {
             c.moveToFirst();
             outputBatch =  setValuetoOutputBatch(c);
-            String strOutputtime = c.getString(c.getColumnIndex(dbHelper.KEY_INPUTTIME));
+            String strOutputtime = c.getString(c.getColumnIndex(dbHelper.KEY_OUTPUTTIME));
             outputBatch.setOutputtime(Timestamp.valueOf(strOutputtime));
         }
         return outputBatch;

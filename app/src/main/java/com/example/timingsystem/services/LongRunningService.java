@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.SystemClock;
 
+import com.example.timingsystem.Constants;
 import com.example.timingsystem.receiver.AlarmReceiver;
 
 public class LongRunningService extends Service {
@@ -30,8 +31,7 @@ public class LongRunningService extends Service {
         }).start();
         AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
         //int anHour = 60 * 60 * 1000;
-        int anHour = 600 * 1000;
-        long triggerAtTime = SystemClock.elapsedRealtime() + anHour;
+        long triggerAtTime = SystemClock.elapsedRealtime() + Constants.CYCLE_TIME;
         Intent i = new Intent(this, AlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
         manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);

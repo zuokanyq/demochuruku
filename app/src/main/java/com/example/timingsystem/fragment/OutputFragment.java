@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.example.timingsystem.Constants;
 import com.example.timingsystem.MainActivity;
+import com.example.timingsystem.MyApplication;
 import com.example.timingsystem.R;
 import com.example.timingsystem.model.Location;
 import com.example.timingsystem.services.CallWebService;
@@ -103,7 +104,7 @@ public class OutputFragment extends KeyDwonFragment {
                 }
                 adapter.notifyDataSetChanged();
             } else {    //扫描结果是批次号
-                barCode="PP305192AC6035A68";
+            //    barCode="PP1930B8AE6217U24";
 
                 tv_batch_number.setText(barCode);
                 list.clear();
@@ -192,6 +193,12 @@ public class OutputFragment extends KeyDwonFragment {
         if (BatchNo.isEmpty()) {
             Toast.makeText(getActivity(),
                     R.string.msg_batchNo_empty,
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (list.isEmpty()){
+            Toast.makeText(getActivity(),
+                    R.string.msg_LocationNO_empty,
                     Toast.LENGTH_SHORT).show();
             return;
         }
@@ -360,7 +367,8 @@ public class OutputFragment extends KeyDwonFragment {
         @Override
         protected String doInBackground(String... params) {
             //Invoke webservice
-            String url = "http://192.168.168.196:7676/SRC/business/mobilemanagement.asmx";
+            MyApplication app = (MyApplication) mContext.getApplication();
+            String url = app.getServerurl();
             String webMethName = "OutputQuery";
             Map<String, String> paramsmap=new HashMap<String, String>();
             paramsmap.put("OutputQuerySend",generateXml(params[0]));

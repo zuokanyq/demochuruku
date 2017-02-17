@@ -322,8 +322,6 @@ public class InputIntentService extends IntentService {
             return;
         }
 
-        batchno="PP305192AC6035A68";
-
         InputBatch inputBatch = new InputBatch();
         inputBatch.setBatchno(batchno);
         app=(MyApplication)getApplication();

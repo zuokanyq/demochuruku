@@ -57,11 +57,11 @@ public class CallWebService {
 
         try {
             // Invoke web service
-            androidHttpTransport.debug = true;
+      //      androidHttpTransport.debug = true;
             androidHttpTransport.call(SOAP_ACTION+webMethName, envelope);
 
-            String requestDump = androidHttpTransport.requestDump;
-            String responseDump = androidHttpTransport.responseDump;
+//            String requestDump = androidHttpTransport.requestDump;
+//            String responseDump = androidHttpTransport.responseDump;
             // Get the response
             resobj = (SoapObject) envelope.getResponse();
             resobj.addProperty("resMsg", "Success");

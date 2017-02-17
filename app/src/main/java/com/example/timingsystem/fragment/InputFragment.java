@@ -55,6 +55,10 @@ public class InputFragment extends KeyDwonFragment {
 
     private SubmitStateReceiver mSubmitStateReceiver;
 
+    /**
+     * 扫码回调函数
+     * 根据isLocationNumber的值判断扫描的是库位号还是批次号进行分别处理
+     */
     public Barcode2DWithSoft.ScanCallback mScanCallback = new Barcode2DWithSoft.ScanCallback() {
         @Override
         public void onScanComplete(int i, int length, byte[] data) {
@@ -84,7 +88,7 @@ public class InputFragment extends KeyDwonFragment {
 
                 mContext.scrollToBottom(svResult, tv_Result);
             } else {
-
+             //   barCode="PP1930B8AE6217U24";
                 tv_batch_number.setText(barCode);
 
             }
@@ -187,6 +191,8 @@ public class InputFragment extends KeyDwonFragment {
 
 
     private void submit() {
+
+        //数据有效性验证，排除空值
         String BatchNo = tv_batch_number.getText().toString();
         if (BatchNo.isEmpty()) {
             Toast.makeText(getActivity(),
@@ -266,8 +272,6 @@ public class InputFragment extends KeyDwonFragment {
         isCurrFrag = true;
         //动态注册广播接收器
         IntentFilter statusIntentFilter = new IntentFilter(Constants.ACTION_SAVEINPUT);
-        // Adds a data filter for the HTTP scheme
-        //   statusIntentFilter.addDataScheme("http");
         // Instantiates a new DownloadStateReceiver
         mSubmitStateReceiver = new SubmitStateReceiver();
         // Registers the DownloadStateReceiver and its intent filters

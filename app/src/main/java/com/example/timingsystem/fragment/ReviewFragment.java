@@ -95,24 +95,21 @@ public class ReviewFragment extends KeyDwonFragment {
         listviewinput.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-
                 Object o = listviewinput.getItemAtPosition(position);
                 final InputBatch inputbatch=(InputBatch)o;
                 InputBatch detailInputBatch = dbserver.getInputBatch(inputbatch.getId());
                 showWindow(view,true,detailInputBatch,null);
-                /*AlertDialog dialog = new AlertDialog.Builder(mContext).setTitle("提示")
-                        .setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                InputIntentService.startActionPushInputOne(mContext,inputbatch.getId());
-                            }
-                        })
-                        .setMessage("您确定要上传该条数据吗？").create();
-                dialog.show();*/
             }
         });
-
+        listviewoutput.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Object o = listviewoutput.getItemAtPosition(position);
+                final OutputBatch outputbatch=(OutputBatch)o;
+                OutputBatch detailOutputBatch = dbserver.getOutputBatch(outputbatch.getId());
+                showWindow(view,false,null,detailOutputBatch);
+            }
+        });
 
         return v;
 
@@ -414,6 +411,8 @@ public class ReviewFragment extends KeyDwonFragment {
             Toast.makeText(getActivity(),
                     intent.getStringExtra(Constants.EXTENDED_DATA_STATUS),
                     Toast.LENGTH_SHORT).show();
+            AsyncCallData task = new AsyncCallData();
+            task.execute();
         }
     }
 }
