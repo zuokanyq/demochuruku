@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -15,8 +16,11 @@ import android.widget.Toast;
 
 import com.example.timingsystem.model.MdSHMobileUserInfo;
 import com.example.timingsystem.services.CallWebService;
+import com.zebra.adc.decoder.Barcode2DWithSoft;
 
 import org.ksoap2.serialization.SoapObject;
+
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +41,13 @@ public class LoginActivity extends BaseActivity {
     private EditText urlEdit;
 
 	private Button login;
+
+    //扫描工号按钮
+    private Button btnScanning;
+    //激光扫码类
+    public Barcode2DWithSoft mReader;
+    //扫码线程
+    private Thread thread;
     private ProgressDialog dialog = null;
 
     private CheckBox rememberPass;
@@ -47,35 +58,66 @@ public class LoginActivity extends BaseActivity {
 
 	public static final String LOGIN_SUECCESS = "success";
     public static final String LOGIN_ERROR = "error";
+    public static final String PWD = "1";
+    private LoginActivity  mContext;
+
+    /**
+     * 扫码回调函数
+     */
+    public Barcode2DWithSoft.ScanCallback mScanCallback = new Barcode2DWithSoft.ScanCallback() {
+        @Override
+        public void onScanComplete(int i, int length, byte[] data) {
+            String strData = "";
+            mContext.mReader.stopScan();
+            String barCode = null;
+            try {
+                if (!"".equals(data) && data != null){
+                    barCode = new String(data, "GBK").trim();
+                }else {
+                    Toast.makeText(mContext,getResources().getString(R.string.scan_timeOut),Toast.LENGTH_SHORT).show();
+                }
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            accountEdit.setText(barCode);
+        }
+    };
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
-
+        mContext = this;
+        HanderInitTask handerInitTaskask = new HanderInitTask();
+        handerInitTaskask.execute();
+        initUI();
         MdSHMobileUserInfo.initMapping();
+       // 跟据用户需求采用扫描方式暂时不用初始化用户名密码
+       //  initUserNameAndPw();
 
-		pref = PreferenceManager.getDefaultSharedPreferences(this);
-		accountEdit = (EditText) findViewById(R.id.account);
-		passwordEdit = (EditText) findViewById(R.id.password);
-		urlEdit = (EditText) findViewById(R.id.url);
-		rememberPass = (CheckBox) findViewById(R.id.remember_pass);
-		login = (Button) findViewById(R.id.login);
-		boolean isRemember = pref.getBoolean("remember_password", false);
-        String url= pref.getString("url","192.168.168.196:7676");
-        urlEdit.setText(url);
-		if (isRemember) {
-			String account = pref.getString("account", "");
-			String password = pref.getString("password", "");
-			accountEdit.setText(account);
-			passwordEdit.setText(password);
-			rememberPass.setChecked(true);
-		}
+        /**
+         * 扫描工号
+         */
+        btnScanning.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mContext.mReader != null) {
+                    mContext.mReader.setScanCallback(mScanCallback);
+                }
+
+                thread = new DecodeThread();
+                thread.start();
+            }
+        });
+
 		login.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
                 userID = accountEdit.getText().toString();
-                passWord = passwordEdit.getText().toString();
+                //根据用户需求定义密码常量
+                //passWord = passwordEdit.getText().toString();
+                passWord = PWD;
                 serverUrl= urlEdit.getText().toString();
                 editor = pref.edit();
                 editor.putString("url", serverUrl);
@@ -84,12 +126,76 @@ public class LoginActivity extends BaseActivity {
                     AsyncCallWS task = new AsyncCallWS();
                     task.execute(serverUrl);
                 } else {
-                    accountEdit.setText("Please enter name");
+                    accountEdit.setText(getResources().getString(R.string.PleaseAccount));
                 }
 
 			}
 		});
 	}
+
+    /**
+     * 初始化用户名和密码
+     */
+    private void initUserNameAndPw() {
+        boolean isRemember = pref.getBoolean("remember_password", false);
+        if (isRemember) {
+            String account = pref.getString("account", "");
+            String password = pref.getString("password", "");
+            accountEdit.setText(account);
+            passwordEdit.setText(password);
+            rememberPass.setChecked(true);
+        }
+    }
+
+    /**
+     * 初始化UI组件
+     */
+    private void initUI() {
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        accountEdit = (EditText) findViewById(R.id.account);
+        accountEdit.setText("");
+        accountEdit.setKeyListener(null);
+        passwordEdit = (EditText) findViewById(R.id.password);
+        passwordEdit.setText("");
+        urlEdit = (EditText) findViewById(R.id.url);
+        rememberPass = (CheckBox) findViewById(R.id.remember_pass);
+        login = (Button) findViewById(R.id.login);
+        btnScanning = (Button) findViewById(R.id.btn_BnScan);
+        String url= pref.getString("url","192.168.168.196:7676");
+        urlEdit.setText(url);
+    }
+
+    /**
+     * 初始化扫描硬件
+     */
+    private void  initScanningHardware() {
+        try {
+            mContext.mReader = Barcode2DWithSoft.getInstance();
+            if (mContext.mReader != null) {
+                mContext.mReader.open(LoginActivity.this);
+                mReader.setParameter(324, 1);
+                mReader.setParameter(300, 0); // Snapshot Aiming
+                mReader.setParameter(361, 0); // Image Capture Illumination
+
+            }
+        } catch (Exception ex) {
+
+            Toast.makeText(LoginActivity.this, ex.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+
+
+        }
+
+    }
+
+    private  class  HanderInitTask extends AsyncTask{
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            initScanningHardware();
+            return null;
+        }
+    }
 
     private class AsyncCallWS extends AsyncTask<String, String, String> {
 
@@ -179,6 +285,21 @@ public class LoginActivity extends BaseActivity {
         SoapObject returnobj = (SoapObject)obj.getProperty("LoginReturn");
         res=returnobj.getProperty("Message").toString();
         return res;
+    }
+
+    /**
+     * 扫码线程实现类
+     */
+    private class DecodeThread extends Thread {
+        public DecodeThread() {
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            mContext.mReader.scan();
+        }
+
     }
 
 }

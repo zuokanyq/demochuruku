@@ -1,0 +1,30 @@
+登录页：com.example.timingsystem\LoginActivity
+登录后主页：\MainActivity
+主页中各个标签页： fragment目录下
+						InputFragment.java	入库标签页
+						OutputFragment.java	出库标签页
+						ReviewFragment.java	维护标签页
+						TestFragment.java	测试标签页（已无实际用途）
+						ErDSoftScanFragment.java （设备demo标签页，已无实际用途）
+其他子目录内容：  	helper：与数据库操作相关
+							DatabaseHelper.java
+							DatabaseServer.java
+					model:实体类
+							Batch.java	出入库批次信息父类
+							InputBatch.java 入库信息类
+							OutputBatch.java 出库信息类
+							Location.java 与入库信息关联的库位号信息类
+							MessageRetrun.java	webservice返回信息实体类
+							MdSHMobileUserInfo.java  做webservice信息传递时的测试用类（现在已无实际用途）
+					receiver：接收器
+							AlarmReceiver.java 定时推送数据用接收器
+							ConnectionChangeReceiver.java 监控网络状态用接收器
+					services：服务类
+							CallWebService.java 不是真的服务类，只是封装了调用服务器端webservice的方法
+							InputIntentService.java 主要的后台服务均在此类中，包括 出入库数据保存、出入库数据推送等。
+							LongRunningService.java 与AlarmReceiver.java配合实现定时推送数据
+					
+单元测试类：androidTest\java\com\example\timingsystem
+				TestInput.java 数据库增删改查测试类
+				TestInputxml.java xml生成、解析测试类
+				

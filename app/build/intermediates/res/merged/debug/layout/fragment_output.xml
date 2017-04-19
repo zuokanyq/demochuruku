@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center|left"
+        android:padding="5dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/input_batch_number" />
+
+        <TextView
+            android:id="@+id/tv_batch_number"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:singleLine="true" >
+        </TextView>
+
+        <Button
+            android:id="@+id/btn_BnScan"
+            android:layout_width="100dip"
+            android:layout_height="wrap_content"
+            android:text="@string/title_scan" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/white1" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:gravity="top|left"
+        android:padding="5dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/input_location_number" />
+        <ListView
+            android:id="@+id/list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp">
+        </ListView>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/white1" />
+
+
+    <LinearLayout
+        android:id="@+id/ll_stat"
+        android:layout_width="fill_parent"
+        android:layout_height="50dip"
+        android:orientation="vertical"
+        android:padding="5dp" >
+        <Button
+            android:id="@+id/btn_Location_Scan"
+            android:layout_width="150dip"
+            android:layout_height="wrap_content"
+            android:text="@string/input_btn_location_scan" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="fill_parent"
+        android:layout_height="50dip"
+        android:background="@color/blue3"
+        android:gravity="center" >
+
+        <Button
+            android:id="@+id/btn_submit"
+            android:layout_width="100dip"
+            android:layout_height="wrap_content"
+            android:text="@string/input_btn_submit" />
+
+        <Button
+            android:id="@+id/btn_Clear"
+            android:layout_width="100dip"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dip"
+            android:text="@string/title_clear" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -3,57 +3,48 @@
 
     <item
         is-multidex="false"
-        jar="D:\Development\Android\sdk\extras\android\m2repository\com\android\support\support-v4\18.0.0\support-v4-18.0.0.jar"
-        jumboMode="true"
+        jar="D:\android\demochuruku\app\libs\xUtils-2.5.5.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="d7b27a19b6f7ed3d26d9157147545c94ea8ee535">
+        <dex dex="D:\android\demochuruku\app\build\intermediates\pre-dexed\debug\xUtils-2.5.5_3b0c002c647000f8090e6233aac6438382aa68c6.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\macwang\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-v4\18.0.0\support-v4-18.0.0.jar"
+        jumboMode="false"
         optimize="true"
         revision="23.0.1"
         sha1="44ec51e9d395a47aab135e5e1b556c0007442156">
-        <dex dex="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\pre-dexed\debug\support-v4-18.0.0_bab5611eb5bc79db7dbef36fc0696222cb786f0f.jar" />
+        <dex dex="D:\android\demochuruku\app\build\intermediates\pre-dexed\debug\support-v4-18.0.0_405ee07ffe86136cb219b87199f15222873001df.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
-        jumboMode="true"
+        jar="D:\android\demochuruku\app\libs\ksoap2-android-assembly-2.4-jar-with-dependencies_patchCimoli.jar"
+        jumboMode="false"
         optimize="true"
         revision="23.0.1"
-        sha1="0dac7e2536ebaefcd283587f830f1c557fa23363">
-        <dex dex="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\pre-dexed\debug\instant-run_50c740f293e35142e965ed839342953e3090855e.jar" />
+        sha1="a1a45838731401d61785ef95120fbcab4220d4fd">
+        <dex dex="D:\android\demochuruku\app\build\intermediates\pre-dexed\debug\ksoap2-android-assembly-2.4-jar-with-dependencies_patchCimoli_4ad2ad286cff9412bebe21d3551159aac6fba4e0.jar" />
     </item>
     <item
         is-multidex="false"
-        jar="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.1"
-        sha1="6e7348fa06b3fe6f3289497d8aa91eaa6dca42f5">
-        <dex dex="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\pre-dexed\debug\instant-run-bootstrap_1dccfc3c73f8092168dee9cfcc8eecb2f5a52d18.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="D:\Program Files\Android\Android Studio\gradle\gradle-2.14.1\caches\modules-2\files-2.1\com.squareup.okio\okio\1.6.0\98476622f10715998eacf9240d6b479f12c66143\okio-1.6.0.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.1"
-        sha1="98476622f10715998eacf9240d6b479f12c66143">
-        <dex dex="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\pre-dexed\debug\okio-1.6.0_98f68dbfcbf8ca35c7fc1362a8bdd57c6e1881ed.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="D:\Program Files\Android\Android Studio\gradle\gradle-2.14.1\caches\modules-2\files-2.1\com.squareup.okhttp3\okhttp\3.2.0\f7873a2ebde246a45c2a8d6f3247108b4c88a879\okhttp-3.2.0.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.1"
-        sha1="f7873a2ebde246a45c2a8d6f3247108b4c88a879">
-        <dex dex="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\pre-dexed\debug\okhttp-3.2.0_caffbaf51bda720550285309850eb29c186bdcda.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="D:\Development\Android\projects\samples\demochuruku\app\libs\DeviceAPIver20160627.jar"
-        jumboMode="true"
+        jar="D:\android\demochuruku\app\libs\DeviceAPIver20160627.jar"
+        jumboMode="false"
         optimize="true"
         revision="23.0.1"
         sha1="95b2001423653f6f7412f312d5e1ee24239ebf98">
-        <dex dex="D:\Development\Android\projects\samples\demochuruku\app\build\intermediates\pre-dexed\debug\DeviceAPIver20160627_1c13d862565fabfc8ad3cf50007b471bf8597f71.jar" />
+        <dex dex="D:\android\demochuruku\app\build\intermediates\pre-dexed\debug\DeviceAPIver20160627_53254e801a72b756e62406614f36d3c73f9986f7.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\android\demochuruku\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\18.0.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="8f11f56e350eacabf2273f646d981356eea0ed77">
+        <dex dex="D:\android\demochuruku\app\build\intermediates\pre-dexed\debug\com.android.support-appcompat-v7-18.0.0_88a7a6be042e3c9a6b2606ad9115b78252120a84.jar" />
     </item>
 
 </items>

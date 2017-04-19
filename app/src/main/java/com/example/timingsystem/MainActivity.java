@@ -105,9 +105,9 @@ public class MainActivity extends BaseTabFragmentActivity {
 		protected Boolean doInBackground(String... params) {
 			
 			
-			boolean result = false;
+			boolean result = true;
 
-            if (mReader != null) {
+          /*  if (mReader != null) {
                 result = mReader.open(MainActivity.this);
 
                 if (result) {
@@ -115,10 +115,10 @@ public class MainActivity extends BaseTabFragmentActivity {
                     mReader.setParameter(300, 0); // Snapshot Aiming
                     mReader.setParameter(361, 0); // Image Capture Illumination
                 }
-            }
+            }*/
             return result;
 		}
-
+		/*
 		@Override
 		protected void onPostExecute(Boolean result) {
 			super.onPostExecute(result);
@@ -144,7 +144,7 @@ public class MainActivity extends BaseTabFragmentActivity {
 			mypDialog.setMessage("init...");
 			mypDialog.setCanceledOnTouchOutside(false);
 			mypDialog.show();
-		}
+		}*/
 
 	}
 

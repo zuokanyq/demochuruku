@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="ksoap2-android-assembly-2.4-jar-with-dependencies_patchCimoli">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/ksoap2-android-assembly-2.4-jar-with-dependencies_patchCimoli.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
